@@ -18,7 +18,7 @@ pip install playwright --break-system-packages   # if missing; uses system googl
 ```
 
 ## Making an episode from a voiceover
-1. `mkdir episodes/NNN-slug` (next free number from 001) and copy `episodes/000-reference/index.html` into it.
+1. `mkdir episodes/NNN-slug`, where NNN is the number of the episode ID in the "Dev Shorts Studio" pipeline sheet (DS-007 → `episodes/007-figma-sharding`), and copy `episodes/000-reference/index.html` into it.
 2. Scene timing from the voice: `python3 tools/scene_times.py voice.mp3 --scenes <paragraph count>`
 3. Edit only the data at the top of the page: `DURATION` (= MP3 length + ~3 s end card), `TITLES`, `CAPTIONS` (from the CLEAN script; split each scene's phrases across its span in proportion to their length), and the story-state functions (`redisMode`, `pgLoad`, ...) so every visual change lands on its scene start. Replace the diagram nodes for the new system using the same components.
 4. Review stills at the busiest moments: `python3 tools/render.py stills episodes/NNN-slug/index.html stills 2 9 14 21 32 44 48` and look at them.
