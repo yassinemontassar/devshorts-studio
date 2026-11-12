@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dev Shorts: Your cache just died</title>
+<style>
+@font-face { font-family: "ArchivoV"; src: url("../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; }
+@font-face { font-family: "Plex Mono"; src: url("../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Plex Mono"; src: url("../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+
+:root {
+  --ink: #10304F;
+  --ink-deep: #0A2038;
+  --node: #13385B;
+  --paper: #E8F0F7;
+  --muted: #8FA9C2;
+  --signal: #FFC247;
+  --alarm: #FF5D47;
+  --mint: #7FE3B8;
+}
+html, body { margin: 0; padding: 0; background: var(--ink-deep); }
+#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(120% 80% at 50% 42%, var(--ink) 0%, #0E2B48 60%, var(--ink-deep) 100%); }
+svg { position: absolute; inset: 0; }
+.title { position: absolute; left: 80px; top: 236px; width: 860px; font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%; font-size: 82px; line-height: 1.02; letter-spacing: -0.02em; color: var(--paper); will-change: transform, opacity; }
+.caption { position: absolute; left: 95px; width: 840px; top: 1408px; text-align: center; font-family: "ArchivoV"; font-weight: 600; font-stretch: 100%; font-size: 44px; line-height: 1.22; color: var(--paper); text-shadow: 0 2px 18px rgba(6, 20, 36, .85); }
+.mono { font-family: "Plex Mono"; font-weight: 500; }
+#clock { position: absolute; left: 80px; top: 156px; font-size: 30px; letter-spacing: .02em; color: var(--alarm); display: flex; align-items: center; gap: 14px; }
+#clock .dot { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
+#endcard { position: absolute; left: 80px; width: 860px; top: 690px; }
+#endcard .next { font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%; font-size: 76px; line-height: 1.04; letter-spacing: -0.02em; color: var(--paper); }
+#endcard .handle { margin-top: 40px; font-size: 36px; color: var(--signal); }
+#endcard .more { margin-top: 12px; font-family: "ArchivoV"; font-weight: 500; font-size: 30px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="frame">
+<svg id="stage" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="minor" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0V30" fill="none" stroke="rgba(160,200,235,0.065)" stroke-width="1"/>
+    </pattern>
+    <pattern id="major" width="150" height="150" patternUnits="userSpaceOnUse">
+      <rect width="150" height="150" fill="url(#minor)"/>
+      <path d="M150 0H0V150" fill="none" stroke="rgba(160,200,235,0.13)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#major)"/>
+  <!-- sheet corner marks -->
+  <g stroke="rgba(232,240,247,0.35)" stroke-width="2" fill="none">
+    <path d="M40 96V60H76"/><path d="M1040 96V60H1004"/>
+  </g>
+  <g id="diagram"></g>
+  <g id="packets"></g>
+  <g id="notes"></g>
+  <rect id="scan" x="0" y="0" width="1080" height="4" fill="#FFC247" opacity="0"/>
+</svg>
+<div id="clock" class="mono"><span class="dot"></span><span id="clockText"></span></div>
+<div id="titles"></div>
+<div id="captions"></div>
+<div id="endcard"><div class="next">Next: what if Kafka dies?</div><div class="handle mono">@yassine.montassar</div><div class="more">Full breakdown in bio</div></div>
+</div>
+
+<script>
+// ---------- timeline data (the only part that changes per episode) ----------
+const DURATION = 54.0;
+const TITLES = [
+  [0.15, 4.3,  "Your cache just died."],
+  [5.25, 12.9, "95% of reads never touch Postgres."],
+  [13.2, 17.5, "Redis restarts. Empty."],
+  [17.8, 26.5, "20× the load. In one second."],
+  [26.8, 34.5, "Retries make it worse."],
+  [34.8, 46.5, "Design for the cold cache."],
+  [46.8, 50.6, "Your cache is load‑bearing."],
+];
+const CAPTIONS = [
+  [0.2, 2.1, "Your cache just died."],
+  [2.2, 4.25, "Your database is next."],
+  [5.1, 6.6, "Here’s a normal day."],
+  [6.8, 10.2, "Ninety-five percent of reads are answered by Redis."],
+  [10.4, 12.7, "Postgres only sees the misses."],
+  [13.1, 14.6, "Then Redis restarts."],
+  [15.0, 16.1, "It comes back…"],
+  [16.3, 17.4, "empty."],
+  [17.7, 19.4, "Now every read misses."],
+  [19.6, 22.8, "Five percent of traffic becomes a hundred percent."],
+  [23.0, 26.3, "That’s twenty times the load, in one second."],
+  [26.7, 28.1, "Queries slow down."],
+  [28.3, 29.7, "Connections pile up."],
+  [29.9, 32.4, "The API times out, so clients retry…"],
+  [32.6, 34.3, "and make it worse."],
+  [34.7, 36.9, "The fix isn’t a bigger database."],
+  [37.1, 40.2, "Coalesce requests, so one query refills each key."],
+  [40.4, 42.8, "Put a breaker in front of Postgres."],
+  [43.0, 45.8, "And stagger your expiry times."],
+  [46.7, 48.6, "Your cache isn’t an optimization."],
+  [48.8, 50.5, "It’s load‑bearing."],
+];
+
+// ---------- helpers ----------
+const NS = "http://www.w3.org/2000/svg";
+const C = { paper: "#E8F0F7", muted: "#8FA9C2", signal: "#FFC247", alarm: "#FF5D47", mint: "#7FE3B8", node: "#13385B" };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const p = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = k => 1 - Math.pow(1 - k, 3);
+const inOutCubic = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const outQuint = k => 1 - Math.pow(1 - k, 5);
+function mix(c1, c2, k) {
+  const h = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+  const a = h(c1), b = h(c2);
+  return "#" + a.map((v, i) => Math.round(lerp(v, b[i], k)).toString(16).padStart(2, "0")).join("");
+}
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || document.getElementById("diagram")).appendChild(e);
+  return e;
+}
+// seeded random
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+// ---------- story state (pure functions of t) ----------
+// redis: 0 healthy, 1 dead, 2 empty, warming handled via redisWarm
+function redisMode(t) {
+  if (t < 4.4) return "dead";
+  if (t < 13.9) return "ok";
+  if (t < 15.0) return "dead";
+  if (t < 43.4) return "empty";
+  if (t < 45.6) return "warming";
+  return "ok";
+}
+function hitRate(t) {
+  const m = redisMode(t);
+  if (m === "ok") return 95;
+  if (m === "warming") return Math.round(95 * outCubic(p(t, 43.4, 45.6)));
+  return 0;
+}
+function pgLoad(t) {
+  if (t < 4.4) return 100;
+  if (t < 17.6) return 5;
+  if (t < 37.4) return lerp(5, 100, outCubic(p(t, 17.8, 20.6)));
+  if (t < 43.4) return lerp(100, 34, inOutCubic(p(t, 37.6, 42.6)));
+  return lerp(34, 6, inOutCubic(p(t, 43.4, 46)));
+}
+function latency(t) {
+  if (t < 4.4) return 2400;
+  if (t < 17.6) return 18;
+  if (t < 26.6) return lerp(18, 640, outCubic(p(t, 18.4, 25)));
+  if (t < 34.6) return lerp(640, 2400, inOutCubic(p(t, 26.8, 33)));
+  return lerp(2400, 18, inOutCubic(p(t, 37.4, 45.6)));
+}
+const congestion = t => t < 4.4 ? 1 : t < 17.6 ? 0 : t < 34.6 ? lerp(0.55, 1, p(t, 26.6, 30)) * p(t, 17.6, 19) : lerp(1, 0, p(t, 37.4, 44));
+const errorsOn = t => (t < 4.4) || (t > 29.9 && t < 34.6);
+const drawP = (t, start, len = 0.7) => t < 4.4 ? 1 : outCubic(p(t, start, start + len));
+function diagramAlpha(t) {
+  const fadeRewind = t >= 4.4 && t < 5.0 ? 1 - p(t, 4.4, 4.75) : 1;
+  const end = 1 - p(t, 50.8, 51.3);
+  return Math.min(fadeRewind, end);
+}
+
+// ---------- build diagram ----------
+const API = { x: 515, y: 840, w: 360, h: 140 };
+const REDIS = { x: 290, y: 1130, w: 370, h: 150 };
+const PG = { x: 740, y: 1130, w: 370, h: 150 };
+const CLIENTS = [290, 515, 740].map(x => ({ x, y: 590 }));
+
+function nodeBox(n, start) {
+  const g = el("g", {});
+  const r = el("rect", { x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 16, fill: C.node, "fill-opacity": 0, stroke: C.paper, "stroke-width": 3 }, g);
+  return { g, r, start, len: 2 * (n.w + n.h) };
+}
+const parts = [];
+// edges first so nodes sit on top
+const edgePaths = [];
+CLIENTS.forEach((c, i) => {
+  const tx = API.x + (i - 1) * 96;
+  const d = `M${c.x} ${c.y + 58} C ${c.x} ${c.y + 130}, ${tx} ${API.y - 160}, ${tx} ${API.y - API.h / 2 - 2}`;
+  edgePaths.push(el("path", { d, fill: "none", stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round", opacity: .55 }));
+});
+const pRedis = el("path", { d: `M${API.x - 90} ${API.y + API.h / 2 + 2} C ${API.x - 90} ${API.y + 170}, ${REDIS.x} ${REDIS.y - 190}, ${REDIS.x} ${REDIS.y - REDIS.h / 2 - 2}`, fill: "none", stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round", opacity: .55 });
+const pPg = el("path", { d: `M${API.x + 90} ${API.y + API.h / 2 + 2} C ${API.x + 90} ${API.y + 170}, ${PG.x} ${PG.y - 190}, ${PG.x} ${PG.y - PG.h / 2 - 2}`, fill: "none", stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round", opacity: .55 });
+// retry arcs (api -> clients, outside the main edges)
+const retryPaths = CLIENTS.map((c, i) => {
+  const sx = API.x + (i - 1) * 170, side = i === 0 ? -1 : i === 2 ? 1 : 0;
+  const d = i === 1
+    ? `M${API.x + 30} ${API.y - API.h / 2} C ${API.x + 110} ${API.y - 150}, ${c.x + 90} ${c.y + 110}, ${c.x + 34} ${c.y + 50}`
+    : `M${sx} ${API.y - API.h / 2 + 10} C ${sx + side * 120} ${API.y - 120}, ${c.x + side * 110} ${c.y + 60}, ${c.x + side * 36} ${c.y + 24}`;
+  return el("path", { d, fill: "none", stroke: C.alarm, "stroke-width": 2.5, "stroke-dasharray": "2 12", "stroke-linecap": "round", opacity: 0 });
+});
+
+// clients: phone glyphs
+const phones = CLIENTS.map(c => {
+  const g = el("g", {});
+  const r = el("rect", { x: c.x - 33, y: c.y - 56, width: 66, height: 112, rx: 13, fill: "none", stroke: C.paper, "stroke-width": 3 }, g);
+  el("line", { x1: c.x - 11, y1: c.y + 41, x2: c.x + 11, y2: c.y + 41, stroke: C.paper, "stroke-width": 3, "stroke-linecap": "round" }, g);
+  return { g, r };
+});
+const usersLabel = el("text", { x: 80, y: 599, fill: C.muted, "font-family": "Plex Mono", "font-size": 28 });
+usersLabel.textContent = "users";
+
+const apiN = nodeBox(API), redisN = nodeBox(REDIS), pgN = nodeBox(PG);
+function nodeText(n, main, sub) {
+  const a = el("text", { x: n.x - n.w / 2 + 30, y: n.y - 8, fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 42 });
+  a.textContent = main;
+  const b = el("text", { x: n.x - n.w / 2 + 30, y: n.y + 34, fill: C.muted, "font-family": "Plex Mono", "font-size": 29 });
+  b.textContent = sub;
+  return [a, b];
+}
+const [apiT, apiS] = nodeText(API, "api", "p99 18 ms");
+const [redisT, redisS] = nodeText(REDIS, "redis", "hit rate 95%");
+const [pgT, pgS] = nodeText(PG, "postgres", "load 5%");
+// glyphs: redis stack, postgres cylinder, api braces
+const gR = el("g", {});
+[0, 16, 32].forEach(dy => el("path", { d: `M${REDIS.x + 112} ${REDIS.y - 34 + dy} h40`, stroke: C.paper, "stroke-width": 3, "stroke-linecap": "round" }, gR));
+const gP = el("g", {});
+el("ellipse", { cx: PG.x + 132, cy: PG.y - 38, rx: 21, ry: 7, fill: "none", stroke: C.paper, "stroke-width": 3 }, gP);
+el("path", { d: `M${PG.x + 111} ${PG.y - 38} v40 a21 7 0 0 0 42 0 v-40`, fill: "none", stroke: C.paper, "stroke-width": 3 }, gP);
+const gA = el("text", { x: API.x + 100, y: API.y - 6, fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 40, opacity: .9 });
+gA.textContent = "{ }";
+// load meter inside postgres
+const meterBg = el("rect", { x: PG.x - PG.w / 2 + 30, y: PG.y + 52, width: PG.w - 60, height: 10, rx: 5, fill: "rgba(232,240,247,0.14)" });
+const meter = el("rect", { x: PG.x - PG.w / 2 + 30, y: PG.y + 52, width: 10, height: 10, rx: 5, fill: C.paper });
+// failure ring
+const ring = el("circle", { cx: REDIS.x, cy: REDIS.y, r: 80, fill: "none", stroke: C.alarm, "stroke-width": 3, opacity: 0 });
+
+// ---------- notes (fix scene: numbered blueprint callouts + legend) ----------
+const notes = document.getElementById("notes");
+function marker(x, y, n, parent) {
+  const g = el("g", { opacity: 0 }, parent || notes);
+  el("circle", { cx: x, cy: y, r: 19, fill: "#10304F", stroke: C.signal, "stroke-width": 3 }, g);
+  const t = el("text", { x, y: y + 8, "text-anchor": "middle", fill: C.signal, "font-family": "Plex Mono", "font-weight": 600, "font-size": 24 }, g); t.textContent = n;
+  return g;
+}
+const lenPg = pPg.getTotalLength();
+const fPt = pPg.getPointAtLength(lenPg * 0.12), bPt = pPg.getPointAtLength(lenPg * 0.8);
+const funnel = el("path", { d: `M${fPt.x - 24} ${fPt.y - 18} h48 l-15 20 v15 h-18 v-15 z`, fill: "#10304F", stroke: C.signal, "stroke-width": 3, "stroke-linejoin": "round", opacity: 0 }, notes);
+const mA = marker(fPt.x + 54, fPt.y - 6, "1");
+const brk = el("g", { opacity: 0 }, notes);
+el("circle", { cx: bPt.x - 22, cy: bPt.y, r: 8, fill: "#10304F", stroke: C.signal, "stroke-width": 3 }, brk);
+el("circle", { cx: bPt.x + 22, cy: bPt.y, r: 8, fill: "#10304F", stroke: C.signal, "stroke-width": 3 }, brk);
+const hinge = el("line", { x1: bPt.x - 22, y1: bPt.y, x2: bPt.x + 22, y2: bPt.y, stroke: C.signal, "stroke-width": 4, "stroke-linecap": "round" }, brk);
+const mB = marker(bPt.x + 62, bPt.y - 4, "2");
+const ticks = [];
+for (let i = 0; i < 9; i++) {
+  const x = REDIS.x - 140 + i * 35;
+  ticks.push({ x, off: [0.1, 0.62, 0.33, 0.85, 0.2, 0.71, 0.47, 0.05, 0.9][i], bar: el("rect", { x: x - 5, y: 1221, width: 10, height: 34, rx: 3, fill: C.signal, opacity: 0 }, notes), base: el("line", { x1: x - 10, y1: 1259, x2: x + 10, y2: 1259, stroke: C.signal, "stroke-width": 2, opacity: 0 }, notes) });
+}
+const mC = marker(REDIS.x + 172, 1241, "3");
+// short labels beside the markers (the voiceover carries the explanation)
+function tag(x, y, text) { const t = el("text", { x, y, fill: C.signal, "font-family": "ArchivoV", "font-weight": 700, "font-size": 30, opacity: 0 }, notes); t.textContent = text; return t; }
+const lA = tag(fPt.x + 84, fPt.y + 4, "coalesce");
+const lB = tag(bPt.x + 92, bPt.y + 6, "breaker");
+const lC = tag(REDIS.x + 202, 1251, "TTL jitter");
+
+// ---------- packets ----------
+const STREAMS = [];
+function stream(path, rateFn, durFn, color, r = 7, opts = {}) {
+  const s = { path, len: path.getTotalLength(), color, r, spawns: [], durFn, reverse: !!opts.reverse, skipAt: opts.skipAt };
+  let acc = rnd(), dt = 1 / 240;
+  for (let t = 0; t < DURATION; t += dt) {
+    acc += rateFn(t) * dt;
+    if (acc >= 1) { acc -= 1; s.spawns.push({ t: t + rnd() * dt, dur: durFn(t) * lerp(0.9, 1.1, rnd()), wob: rnd() }); }
+  }
+  STREAMS.push(s); return s;
+}
+const live = t => t < 50.6;
+const clientRate = t => !live(t) ? 0 : t < 4.4 ? 3.4 : (t > 29.9 && t < 36) ? 3.2 : 1.9;
+const toRedis = t => redisMode(t) === "ok" ? 5.4 : redisMode(t) === "warming" ? 5.4 * hitRate(t) / 95 : 0;
+function toPg(t) {
+  if (!live(t)) return 0;
+  if (t < 4.4) return 9;
+  if (t < 17.6) return 0.3;
+  if (t < 37.4) return lerp(0.3, t > 29.9 ? 8.6 : 6.4, outCubic(p(t, 17.8, 19.4)));
+  if (t < 43.4) return lerp(8.6, 0.9, outCubic(p(t, 37.6, 41)));
+  return 0.35;
+}
+const retryRate = t => (t < 4.4 || (t > 30.2 && t < 34.6)) ? 2.6 : 0;
+edgePaths.forEach(pa => stream(pa, clientRate, () => 0.62, C.signal, 8));
+stream(pRedis, toRedis, () => 0.42, C.signal, 8);
+stream(pRedis, toRedis, () => 0.42, C.paper, 5.5, { reverse: true });
+stream(pPg, toPg, t => lerp(0.55, 1.9, congestion(t)), C.signal, 8);
+retryPaths.forEach(pa => stream(pa, retryRate, () => 0.7, C.alarm, 7));
+const pool = []; const pg = document.getElementById("packets");
+function dot(i) { while (pool.length <= i) pool.push(el("circle", { r: 6 }, pg)); return pool[i]; }
+
+// error badges
+const badges = [];
+for (let k = 0; k < 60; k++) badges.push(el("text", { "font-family": "Plex Mono", "font-weight": 600, "font-size": 30, fill: C.alarm, opacity: 0 }, notes));
+
+// ---------- HTML text layers ----------
+const titlesEl = document.getElementById("titles"), capsEl = document.getElementById("captions");
+const titleNodes = TITLES.map(([a, b, s]) => { const d = document.createElement("div"); d.className = "title"; d.textContent = s; titlesEl.appendChild(d); return d; });
+const capNodes = CAPTIONS.map(([a, b, s]) => { const d = document.createElement("div"); d.className = "caption"; d.textContent = s; capsEl.appendChild(d); return d; });
+const clockEl = document.getElementById("clock"), clockText = document.getElementById("clockText"), endEl = document.getElementById("endcard");
+
+function setDraw(e, len, k) { e.setAttribute("stroke-dasharray", `${len} ${len}`); e.setAttribute("stroke-dashoffset", len * (1 - k)); }
+const STATIC_DIM = [apiN.g, pgN.g, pPg, ...edgePaths].map(e => [e, parseFloat(e.getAttribute("opacity") ?? 1)]);
+const edgeLens = new Map(); [...edgePaths, pRedis, pPg, ...retryPaths].forEach(e => edgeLens.set(e, e.getTotalLength()));
+
+// ---------- render(t): everything on screen is a function of t ----------
+function render(t) {
+  const A = diagramAlpha(t);
+  document.getElementById("diagram").setAttribute("opacity", A);
+  pg.setAttribute("opacity", A);
+
+  // pen-draw
+  phones.forEach((ph, i) => { setDraw(ph.r, 340, drawP(t, 5.0 + i * 0.08)); ph.g.setAttribute("opacity", drawP(t, 5.0 + i * 0.08) > 0 ? 1 : 0); });
+  usersLabel.setAttribute("opacity", drawP(t, 5.1));
+  edgePaths.forEach((e, i) => setDraw(e, edgeLens.get(e), drawP(t, 5.25 + i * 0.06)));
+  setDraw(apiN.r, apiN.len, drawP(t, 5.35)); apiN.r.setAttribute("fill-opacity", drawP(t, 5.7));
+  setDraw(pRedis, edgeLens.get(pRedis), drawP(t, 5.55)); setDraw(pPg, edgeLens.get(pPg), drawP(t, 5.6));
+  setDraw(redisN.r, redisN.len, drawP(t, 5.75)); redisN.r.setAttribute("fill-opacity", drawP(t, 6.1));
+  setDraw(pgN.r, pgN.len, drawP(t, 5.85)); pgN.r.setAttribute("fill-opacity", drawP(t, 6.2));
+  [apiT, apiS, gA].forEach(e => e.setAttribute("opacity", drawP(t, 5.8, 0.4)));
+  [redisT, redisS, gR].forEach(e => e.setAttribute("opacity", drawP(t, 6.0, 0.4)));
+  [pgT, pgS, gP, meterBg, meter].forEach(e => e.setAttribute("opacity", drawP(t, 6.1, 0.4)));
+
+  // redis state
+  const m = redisMode(t);
+  let rStroke = C.paper, dash = "none", shake = 0;
+  if (m === "dead") { rStroke = C.alarm; if (t > 13.9) shake = Math.sin((t - 13.9) * 70) * 9 * (1 - p(t, 13.9, 14.4)); }
+  if (m === "empty") { rStroke = C.muted; dash = "10 10"; }
+  if (m === "warming") rStroke = mix(C.muted, C.paper, p(t, 43.4, 45.6));
+  const emph = t > 46.6 ? p(t, 46.7, 47.4) : 0;
+  if (emph > 0) rStroke = mix(C.paper, C.signal, emph);
+  redisN.r.setAttribute("stroke", rStroke);
+  if (dash !== "none" && t > 6.2) redisN.r.setAttribute("stroke-dasharray", dash), redisN.r.removeAttribute("stroke-dashoffset");
+  redisN.g.parentNode && redisN.r.setAttribute("transform", `translate(${shake} 0)`);
+  [redisT, redisS, gR].forEach(e => e.setAttribute("transform", `translate(${shake} 0)`));
+  redisS.textContent = m === "dead" ? "down" : m === "empty" ? (t < 16.3 ? "restarting…" : "hit rate 0%") : `hit rate ${hitRate(t)}%`;
+  redisS.setAttribute("fill", m === "dead" ? C.alarm : C.muted);
+  redisT.setAttribute("fill", m === "dead" ? C.alarm : emph > 0 ? mix(C.paper, C.signal, emph) : C.paper);
+  // failure ring at 13.9
+  const rk = p(t, 13.9, 14.7);
+  ring.setAttribute("r", lerp(170, 270, outCubic(rk))); ring.setAttribute("opacity", rk > 0 && rk < 1 ? (1 - rk) * 0.9 : 0);
+
+  // postgres load + api latency
+  const L = pgLoad(t), hot = p(L, 60, 90);
+  meter.setAttribute("width", Math.max(10, (PG.w - 60) * L / 100));
+  meter.setAttribute("fill", mix(C.paper, C.alarm, hot));
+  pgS.textContent = `load ${Math.round(L)}%`;
+  pgS.setAttribute("fill", hot > 0.5 ? C.alarm : C.muted);
+  const pulse = hot > 0.6 ? 0.5 + 0.5 * Math.sin(t * 9) : 0;
+  pgN.r.setAttribute("stroke", mix(C.paper, C.alarm, hot * (0.6 + 0.4 * pulse)));
+  const lat = latency(t);
+  apiS.textContent = lat < 1000 ? `p99 ${Math.round(lat)} ms` : `p99 ${(lat / 1000).toFixed(1)} s`;
+  apiS.setAttribute("fill", lat > 400 ? C.alarm : C.muted);
+  apiN.r.setAttribute("stroke", lat > 1200 ? mix(C.paper, C.alarm, p(lat, 1200, 2000)) : C.paper);
+
+  // dim everything but redis at the end
+  const dimK = 1 - 0.65 * emph;
+  // elements whose opacity was already set this frame: scale it; static ones: scale their base
+  [...phones.map(p_ => p_.g), apiT, apiS, gA, pgT, pgS, gP, meter, meterBg, usersLabel].forEach(e => e.setAttribute("opacity", parseFloat(e.getAttribute("opacity") ?? 1) * dimK));
+  STATIC_DIM.forEach(([e, base]) => e.setAttribute("opacity", base * dimK));
+  notes.setAttribute("opacity", dimK);
+  pRedis.setAttribute("stroke", emph > 0 ? mix(C.paper, C.signal, emph) : C.paper);
+  pRedis.setAttribute("opacity", lerp(0.55, 0.9, emph));
+
+  // retry arcs
+  const retryA = t < 4.4 ? 0.9 : (t > 29.9 && t < 35.2) ? 0.9 * p(t, 29.9, 30.3) * (1 - p(t, 34.6, 35.2)) : 0;
+  retryPaths.forEach(e => e.setAttribute("opacity", retryA));
+
+  // packets
+  let n = 0;
+  for (const s of STREAMS) {
+    for (const sp of s.spawns) {
+      if (sp.t > t) break;
+      const age = t - sp.t; if (age > sp.dur) continue;
+      if (t >= 4.4 && sp.t < 6.0) continue; // cleared at the rewind, resume after the redraw
+      let k = age / sp.dur; k = s.reverse ? 1 - k : k;
+      const pt = s.path.getPointAtLength(s.len * inOutCubic(k));
+      const c = dot(n++);
+      c.setAttribute("cx", pt.x); c.setAttribute("cy", pt.y); c.setAttribute("r", s.r);
+      c.setAttribute("fill", s.color);
+      const fade = Math.min(1, age / 0.08, (sp.dur - age) / 0.08);
+      c.setAttribute("opacity", fade * (emph > 0 && s.path !== pRedis ? 1 - 0.65 * emph : 1));
+    }
+  }
+  for (let i = n; i < pool.length; i++) pool[i].setAttribute("opacity", 0);
+
+  // 504 badges
+  let b = 0;
+  if (errorsOn(t)) {
+    for (let k = 0; k < 40; k++) {
+      const st = (t < 4.4 ? 0 : 29.9) + k * 0.33, age = t - st;
+      if (age < 0 || age > 1.1) continue;
+      const c = CLIENTS[k % 3], e = badges[b++];
+      e.textContent = "504";
+      e.setAttribute("x", c.x + 40 - (k % 3 === 2 ? 110 : 0)); e.setAttribute("y", c.y - 20 - 60 * outCubic(age / 1.1));
+      e.setAttribute("opacity", Math.min(1, age / 0.15) * (1 - p(age, 0.7, 1.1)) * A);
+    }
+  }
+  for (let i = b; i < badges.length; i++) badges[i].setAttribute("opacity", 0);
+
+  // fix callouts
+  const off = 1 - p(t, 46.6, 47.2);
+  const fa = p(t, 37.3, 37.8) * off, fb = p(t, 40.5, 41.0) * off, fc = p(t, 43.1, 43.6) * off;
+  const pop = (k) => `${0.6 + 0.4 * outCubic(k)}`;
+  funnel.setAttribute("opacity", fa); mA.setAttribute("opacity", fa); lA.setAttribute("opacity", fa);
+  lA.setAttribute("transform", `translate(${(1 - outCubic(p(t, 37.3, 37.8))) * 20} 0)`);
+  brk.setAttribute("opacity", fb); mB.setAttribute("opacity", fb); lB.setAttribute("opacity", fb);
+  lB.setAttribute("transform", `translate(${(1 - outCubic(p(t, 40.5, 41.0))) * 20} 0)`);
+  const open = outCubic(p(t, 41.3, 41.8)) * -38 * Math.PI / 180;
+  hinge.setAttribute("x2", bPt.x - 22 + 44 * Math.cos(open)); hinge.setAttribute("y2", bPt.y + 44 * Math.sin(open));
+  mC.setAttribute("opacity", fc); lC.setAttribute("opacity", fc);
+  lC.setAttribute("transform", `translate(${(1 - outCubic(p(t, 43.1, 43.6))) * 20} 0)`);
+  ticks.forEach((tk, i) => {
+    const appear = p(t, 43.2 + i * 0.05, 43.5 + i * 0.05) * off;
+    const cyc = ((t - 43) / 2.4 + tk.off) % 1; const h = 34 * (1 - cyc);
+    tk.bar.setAttribute("height", Math.max(2, h)); tk.bar.setAttribute("y", 1225 + (34 - h));
+    tk.bar.setAttribute("opacity", appear); tk.base.setAttribute("opacity", appear * 0.7);
+  });
+
+  // rewind scan
+  const sk = p(t, 4.4, 4.95);
+  const scan = document.getElementById("scan");
+  scan.setAttribute("y", lerp(1920, -10, inOutCubic(sk)));
+  scan.setAttribute("opacity", sk > 0 && sk < 1 ? 0.9 : 0);
+
+  // incident clock
+  let clk = null, ccol = C.alarm;
+  if (t < 4.4) clk = `incident  T+${(8 + t).toFixed(1).padStart(4, "0")}s`;
+  else if (t < 7.2) { clk = "10 minutes earlier"; ccol = C.muted; }
+  else if (t >= 13.9 && t < 46.6) {
+    const resolved = t > 45.6;
+    clk = resolved ? `resolved  T+${(45.6 - 13.9).toFixed(1)}s` : `incident  T+${(t - 13.9).toFixed(1).padStart(4, "0")}s`;
+    ccol = resolved ? C.mint : C.alarm;
+  }
+  const clkA = clk === null ? 0 : (t < 4.4 ? p(t, 0, 0.2) * (1 - p(t, 4.25, 4.4)) : t < 7.2 ? p(t, 5.0, 5.3) * (1 - p(t, 6.9, 7.2)) : p(t, 13.9, 14.1) * (1 - p(t, 46.4, 46.6)));
+  clockEl.style.opacity = clkA; clockText.textContent = clk || ""; clockEl.style.color = ccol;
+  clockEl.querySelector(".dot").style.opacity = (ccol === C.alarm) ? (Math.sin(t * 7) > -0.2 ? 1 : 0.15) : 1;
+
+  // titles: slide up + fade in, quick fade out
+  TITLES.forEach(([a, b2], i) => {
+    const k = outQuint(p(t, a, a + 0.55)), out = 1 - p(t, b2 - 0.25, b2);
+    titleNodes[i].style.opacity = k * out;
+    titleNodes[i].style.transform = `translateY(${(1 - k) * 34}px)`;
+    titleNodes[i].style.display = (t >= a && t <= b2) ? "block" : "none";
+  });
+  // captions
+  CAPTIONS.forEach(([a, b2], i) => {
+    const vis = t >= a && t <= b2;
+    capNodes[i].style.display = vis ? "block" : "none";
+    capNodes[i].style.opacity = p(t, a, a + 0.14) * (1 - p(t, b2 - 0.12, b2));
+  });
+  // end card
+  const ek = outQuint(p(t, 51.0, 51.6));
+  endEl.style.opacity = ek; endEl.style.transform = `translateY(${(1 - ek) * 30}px)`;
+}
+window.render = render;
+window.DURATION = DURATION;
+render(0);
+</script>
+</body>
+</html>
