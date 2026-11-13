@@ -19,11 +19,11 @@ pip install playwright --break-system-packages   # if missing; uses system googl
 
 ## Making an episode from a voiceover
 1. `mkdir episodes/NNN-slug`, where NNN is the number of the episode ID in the "Dev Shorts Studio" pipeline sheet (DS-007 → `episodes/007-figma-sharding`), and copy `episodes/000-reference/index.html` into it.
-2. Scene timing from the voice: `python3 tools/scene_times.py voice.mp3 --scenes <paragraph count>`
+2. Save the CLEAN script (no [tags], one paragraph per scene, blank line between paragraphs) as `episodes/NNN-slug/clean.txt`, then get the scene timing from the voice: `python3 tools/scene_times.py voice.mp3 --script episodes/NNN-slug/clean.txt`. It matches each paragraph break to the right pause even when a dramatic pause inside a paragraph is longer than the break. Check the printed `text` of each scene against what you hear; `--scenes N` (longest pauses only) is a fallback.
 3. Edit only the data at the top of the page: `DURATION` (= MP3 length + ~3 s end card), `TITLES`, `CAPTIONS` (from the CLEAN script; split each scene's phrases across its span in proportion to their length), and the story-state functions (`redisMode`, `pgLoad`, ...) so every visual change lands on its scene start. Replace the diagram nodes for the new system using the same components.
 4. Review stills at the busiest moments: `python3 tools/render.py stills episodes/NNN-slug/index.html stills 2 9 14 21 32 44 48` and look at them.
 5. Render: `python3 tools/render.py video episodes/NNN-slug/index.html out/NNN-slug.mp4 --workers 2 --audio voice.mp3`
-6. Commit the episode folder (not the MP4). New reusable components go into the episode and, once used twice, get noted here.
+6. Commit the episode folder (index.html, script.txt, clean.txt; not the MP4) straight to `main` and push. New reusable components go into the episode and, once used twice, get noted here.
 
 ## Style guardrails (the full spec is in the devshorts-episode-pack skill)
 - Blueprint ink background + drafting grid; colour means state: paper, amber = traffic/fix/hero, red = failure, mint = resolved only.

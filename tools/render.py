@@ -64,7 +64,9 @@ async def video(html, out, workers=4, audio=None):
     silent = str(work / "silent.mp4")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", silent], check=True)
     if audio:
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", silent, "-i", audio, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-af", "apad", "-c:a", "aac", "-b:a", "192k", "-shortest", out]  # apad: keep the end card after the voice ends, check=True)
+        # apad pads the voice with silence so the end card (after the voice ends) is kept; -shortest then cuts at the video's end
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", silent, "-i", audio, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
+                        "-af", "apad", "-c:a", "aac", "-b:a", "192k", "-shortest", out], check=True)
     else:
         os.replace(silent, out)
     print("wrote", out, f"{total} frames")
