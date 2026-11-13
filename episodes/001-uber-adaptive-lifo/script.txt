@@ -1,0 +1,44 @@
+DS-001 · Breaks only at scale · Uber
+Under overload, Uber serves the newest request first.
+Source: Uber Engineering, "How Uber Conquered Database Overload" (2026-04-20)
+https://www.uber.com/us/en/blog/from-static-rate-limiting-to-intelligent-load-management/
+
+== Tagged (ElevenLabs) ==
+[low, steady voice] Under overload, Uber serves the newest request first.
+
+[calm, matter-of-fact] Uber's storage platform, Docstore and Schemaless, serves tens of millions of requests per second. Their engineering team wrote about keeping it alive under overload.
+
+Most queues are first in, first out. Fair... and at normal load, it's fine.
+
+But under overload, the oldest requests have waited the longest. Their clients often gave up, or already retried. So the database works on answers NOBODY is waiting for... [exhales] while fresh requests sit at the back of the line.
+
+An earlier version had its own trap. Fixed wait times meant rejected requests all retried at once. [short pause] Overload. Rejection. Repeat.
+
+[confident] So the queue adapts. At normal load, first in, first out. Under pressure, it flips to last in, first out, favoring requests that can still succeed. And load is measured as requests in flight, right on the storage node, not as queries per second.
+
+The rule: shed load where the state lives, and serve the requests that can still succeed. Uber reports eighty percent more throughput under overload, and about seventy percent lower P-ninety-nine latency.
+
+[calm, matter-of-fact] Under overload, being fair to the oldest request... is unfair to everyone.
+
+== Clean ==
+Under overload, Uber serves the newest request first.
+
+Uber's storage platform, Docstore and Schemaless, serves tens of millions of requests per second. Their engineering team wrote about keeping it alive under overload.
+
+Most queues are first in, first out. Fair... and at normal load, it's fine.
+
+But under overload, the oldest requests have waited the longest. Their clients often gave up, or already retried. So the database works on answers nobody is waiting for... while fresh requests sit at the back of the line.
+
+An earlier version had its own trap. Fixed wait times meant rejected requests all retried at once. Overload. Rejection. Repeat.
+
+So the queue adapts. At normal load, first in, first out. Under pressure, it flips to last in, first out, favoring requests that can still succeed. And load is measured as requests in flight, right on the storage node, not as queries per second.
+
+The rule: shed load where the state lives, and serve the requests that can still succeed. Uber reports eighty percent more throughput under overload, and about seventy percent lower P-ninety-nine latency.
+
+Under overload, being fair to the oldest request... is unfair to everyone.
+
+== Voiceover take ==
+ElevenLabs Roger (Laid-Back, Casual, Resonant), v4, 79.15 s.
+Scene starts (s): 0, 4.39, 15.28, 20.83, 35.69, 45.37, 61.52, 74.20; voice ends 78.94.
+Note: scene_times.py's longest-gap pick misplaced 3 of 7 boundaries on this take (it split a sentence break in
+paragraph 2); starts above were checked against per-sentence speech segments.
