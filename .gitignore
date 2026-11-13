@@ -2,3 +2,4 @@ node_modules/
 out/
 stills/
 *.part.mp4
+/tools/__pycache__/

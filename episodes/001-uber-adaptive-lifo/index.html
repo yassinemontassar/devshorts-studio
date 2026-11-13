@@ -2,556 +2,531 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dev Shorts: Under overload, Uber serves the newest request first</title>
+<title>DS-001 v2 · Under overload, Uber serves the newest request first</title>
 <style>
 @font-face { font-family: "ArchivoV"; src: url("../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; }
 @font-face { font-family: "Plex Mono"; src: url("../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
 @font-face { font-family: "Plex Mono"; src: url("../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
-
-:root {
-  --ink: #10304F;
-  --ink-deep: #0A2038;
-  --node: #13385B;
-  --paper: #E8F0F7;
-  --muted: #8FA9C2;
-  --signal: #FFC247;
-  --alarm: #FF5D47;
-  --mint: #7FE3B8;
-}
-html, body { margin: 0; padding: 0; background: var(--ink-deep); }
-#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(120% 80% at 50% 42%, var(--ink) 0%, #0E2B48 60%, var(--ink-deep) 100%); }
+:root { --paper: #E8F0F7; --muted: #8FA9C2; --signal: #FFC247; --alarm: #FF5D47; --mint: #7FE3B8; }
+html, body { margin: 0; background: #0A2038; }
+#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: radial-gradient(120% 75% at 50% 45%, #12355A 0%, #0E2B48 55%, #081A2E 100%); }
 svg { position: absolute; inset: 0; }
-.title { position: absolute; left: 80px; top: 236px; width: 860px; font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%; font-size: 82px; line-height: 1.02; letter-spacing: -0.02em; color: var(--paper); will-change: transform, opacity; }
-.caption { position: absolute; left: 95px; width: 840px; top: 1408px; text-align: center; font-family: "ArchivoV"; font-weight: 600; font-stretch: 100%; font-size: 44px; line-height: 1.22; color: var(--paper); text-shadow: 0 2px 18px rgba(6, 20, 36, .85); }
-.mono { font-family: "Plex Mono"; font-weight: 500; }
-#clock { position: absolute; left: 80px; top: 156px; font-size: 30px; letter-spacing: .02em; color: var(--muted); display: flex; align-items: center; gap: 14px; }
-#clock .dot { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
-#endcard { position: absolute; left: 80px; width: 860px; top: 690px; }
-#endcard .next { font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%; font-size: 76px; line-height: 1.04; letter-spacing: -0.02em; color: var(--paper); }
-#endcard .handle { margin-top: 40px; font-size: 36px; color: var(--signal); }
-#endcard .more { margin-top: 12px; font-family: "ArchivoV"; font-weight: 500; font-size: 30px; color: var(--muted); }
+.mono { font-family: "Plex Mono"; }
+#series { position: absolute; left: 80px; top: 108px; font: 500 28px "Plex Mono"; color: var(--muted); letter-spacing: .02em; }
+.headline { position: absolute; left: 80px; top: 150px; width: 900px; font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%;
+  font-size: 88px; line-height: 1.0; letter-spacing: -0.025em; color: var(--paper); transform-origin: 0 0; }
+#caption { position: absolute; left: 70px; width: 940px; top: 1318px; text-align: center; font-family: "ArchivoV"; font-weight: 700;
+  font-size: 56px; line-height: 1.16; letter-spacing: -0.01em; }
+#caption span { transition: none; }
+#source { position: absolute; left: 80px; top: 1262px; font: 500 23px "Plex Mono"; color: var(--muted); }
+.big { position: absolute; left: 80px; width: 900px; font-family: "ArchivoV"; color: var(--paper); }
+.big .num { font-weight: 900; font-stretch: 118%; font-size: 236px; line-height: .9; letter-spacing: -0.04em; color: var(--signal); }
+.big .lbl { font-weight: 700; font-size: 50px; margin-top: 14px; }
+.big .sub { font: 500 34px "Plex Mono"; color: var(--muted); margin-top: 12px; }
+#scale { position: absolute; left: 80px; width: 920px; top: 560px; font-family: "ArchivoV"; text-align: left; }
+#scale .a { font-weight: 900; font-stretch: 118%; font-size: 108px; line-height: .95; letter-spacing: -0.035em; color: var(--paper); }
+#scale .b { font: 500 36px "Plex Mono"; color: var(--signal); margin-top: 22px; }
+#scale .a, #scale .b { text-shadow: 0 0 40px #0A2038, 0 0 18px #0A2038; }
+#end { position: absolute; left: 80px; width: 900px; top: 700px; }
+#end .n { font-family: "ArchivoV"; font-weight: 800; font-stretch: 112%; font-size: 84px; line-height: 1.02; letter-spacing: -0.02em; color: var(--paper); }
+#end .h { margin-top: 44px; font: 600 40px "Plex Mono"; color: var(--signal); }
+#end .m { margin-top: 12px; font: 500 32px "ArchivoV"; color: var(--muted); }
+#flash { position: absolute; inset: 0; background: #FFC247; mix-blend-mode: screen; opacity: 0; }
+#topfade { position: absolute; left: 0; top: 0; width: 1080px; height: 350px; background: linear-gradient(#0B2139 0%, rgba(11,33,57,.97) 70%, rgba(11,33,57,0) 100%); }
+#botfade { position: absolute; left: 0; top: 1225px; width: 1080px; height: 695px; background: linear-gradient(rgba(9,28,48,0) 0%, rgba(9,28,48,.9) 9%, #091C30 30%); }
 </style>
 </head>
 <body>
 <div id="frame">
-<svg id="stage" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+<svg id="svg" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <pattern id="minor" width="30" height="30" patternUnits="userSpaceOnUse">
-      <path d="M30 0H0V30" fill="none" stroke="rgba(160,200,235,0.065)" stroke-width="1"/>
-    </pattern>
-    <pattern id="major" width="150" height="150" patternUnits="userSpaceOnUse">
-      <rect width="150" height="150" fill="url(#minor)"/>
-      <path d="M150 0H0V150" fill="none" stroke="rgba(160,200,235,0.13)" stroke-width="1"/>
-    </pattern>
+    <pattern id="minor" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="rgba(160,200,235,0.06)" stroke-width="1"/></pattern>
+    <pattern id="major" width="150" height="150" patternUnits="userSpaceOnUse"><rect width="150" height="150" fill="url(#minor)"/><path d="M150 0H0V150" fill="none" stroke="rgba(160,200,235,0.12)" stroke-width="1"/></pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+    <radialGradient id="vig" cx="50%" cy="46%" r="70%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".45"/></radialGradient>
   </defs>
-  <rect width="1080" height="1920" fill="url(#major)"/>
-  <!-- sheet corner marks -->
-  <g stroke="rgba(232,240,247,0.35)" stroke-width="2" fill="none">
-    <path d="M40 96V60H76"/><path d="M1040 96V60H1004"/>
+  <g id="world">
+    <rect x="-6000" y="-6000" width="13080" height="13920" fill="url(#major)"/>
+    <g id="grid"></g>
+    <g id="lane"></g>
+    <g id="nodes"></g>
+    <g id="cards"></g>
+    <g id="fx"></g>
+    <g id="notes"></g>
   </g>
-  <g id="diagram"></g>
-  <g id="queue"></g>
-  <g id="packets"></g>
-  <g id="notes"></g>
-  <g id="below"></g>
-  <rect id="scan" x="0" y="0" width="1080" height="4" fill="#FFC247" opacity="0"/>
+  <rect width="1080" height="1920" fill="url(#vig)" pointer-events="none"/>
+  <g stroke="rgba(232,240,247,0.32)" stroke-width="2" fill="none"><path d="M40 92V56H76"/><path d="M1040 92V56H1004"/></g>
 </svg>
-<div id="clock" class="mono"><span id="clockText">Breaks only at scale · Uber</span></div>
-<div id="titles"></div>
-<div id="captions"></div>
-<div id="endcard"><div class="next">Next: what else breaks at scale?</div><div class="handle mono">@yassine.montassar</div><div class="more">Full breakdown in bio</div></div>
+<div id="topfade"></div><div id="botfade"></div>
+<div id="series"></div>
+<div id="heads"></div>
+<div id="scale"><div class="a">Tens of millions<br>of requests<br>per second</div><div class="b">thousands of clusters · tens of petabytes</div></div>
+<div class="big" id="big1" style="top:500px"><div class="num" id="n1">+0%</div><div class="lbl">throughput under overload</div><div class="sub">3,000 → 5,400 QPS avg</div></div>
+<div class="big" id="big2" style="top:880px"><div class="num" id="n2">−0%</div><div class="lbl">P99 upsert latency</div><div class="sub">3.1 s → 1.0 s</div></div>
+<div id="source"></div>
+<div id="caption"></div>
+<div id="end"><div class="n">Next: what else breaks at scale?</div><div class="h">@yassine.montassar</div><div class="m">Full breakdown in bio</div></div>
+<div id="flash"></div>
 </div>
-
+<script src="timing.js"></script>
 <script>
-// ---------- timeline data (the only part that changes per episode) ----------
-// scene starts from the voiceover (paragraph pauses): 0, 4.39, 15.28, 20.83, 35.69, 45.37, 61.52, 74.20; voice ends 78.94
-const S = [0, 4.39, 15.28, 20.83, 35.69, 45.37, 61.52, 74.20];
-const VOICE_END = 79.15;
-const DURATION = 82.3;
-const TITLES = [
-  [0.15, 4.2,  "Newest request goes first"],
-  [4.6, 15.1,  "Tens of millions of requests/s"],
-  [15.4, 20.65, "First in, first out"],
-  [20.95, 35.5, "Serving answers nobody wants"],
-  [35.8, 45.2, "Fixed timeouts, synced retries"],
-  [45.5, 61.35, "Measure in‑flight. Flip to LIFO."],
-  [61.65, 74.0, "+80% throughput under overload"],
-  [74.3, 79.1, "Fair to the oldest. Unfair to all."],
-];
-const CAPTIONS = [
-  [0.0, 1.4, "Under overload,"],
-  [1.45, 3.95, "Uber serves the newest request first."],
-  [4.35, 7.6, "Uber’s storage platform, Docstore and Schemaless,"],
-  [7.62, 10.9, "serves tens of millions of requests per second."],
-  [11.08, 12.75, "Their engineering team wrote about"],
-  [12.77, 14.85, "keeping it alive under overload."],
-  [15.23, 17.8, "Most queues are first in, first out."],
-  [17.87, 18.5, "Fair…"],
-  [18.56, 20.6, "and at normal load, it’s fine."],
-  [20.78, 22.05, "But under overload,"],
-  [22.08, 24.75, "the oldest requests have waited the longest."],
-  [24.85, 28.1, "Their clients often gave up, or already retried."],
-  [28.26, 32.4, "So the database works on answers nobody is waiting for…"],
-  [32.56, 35.4, "while fresh requests sit at the back of the line."],
-  [35.64, 37.7, "An earlier version had its own trap."],
-  [37.87, 42.15, "Fixed wait times meant rejected requests all retried at once."],
-  [42.3, 43.2, "Overload."],
-  [43.24, 44.2, "Rejection."],
-  [44.28, 45.15, "Repeat."],
-  [45.32, 46.95, "So the queue adapts."],
-  [47.0, 49.6, "At normal load, first in, first out."],
-  [49.7, 52.75, "Under pressure, it flips to last in, first out,"],
-  [52.77, 55.4, "favoring requests that can still succeed."],
-  [55.54, 57.95, "And load is measured as requests in flight,"],
-  [57.97, 61.3, "right on the storage node, not as queries per second."],
-  [61.47, 64.25, "The rule: shed load where the state lives,"],
-  [64.28, 67.2, "and serve the requests that can still succeed."],
-  [67.33, 70.65, "Uber reports eighty percent more throughput under overload,"],
-  [70.69, 73.95, "and about seventy percent lower P99 latency."],
-  [74.15, 75.3, "Under overload,"],
-  [75.34, 77.45, "being fair to the oldest request…"],
-  [77.49, 79.2, "is unfair to everyone."],
-];
-const SOURCE = "source: Uber Engineering, Apr 2026";
-const SOURCE_S7 = "source: Uber Engineering, Apr 2026 (vs. token‑bucket limiter)";
-
-// ---------- helpers ----------
+// =====================================================================================
+// DS-001 (the reference episode). Every frame is a pure function of t: window.render(t).
+// The queue is simulated once at load (deterministic), then looked up per frame.
+//
+// THIS IS THE TEMPLATE ("blueprint v2" motion system). For a new episode, copy this folder's
+// index.html and:
+//   KEEP as is:   CSS, helpers, timing helpers W()/SC/WORDS, sfx(), camera (fr/cam/camera),
+//                 headlines (big for 2.4 s, then settle small), karaoke captions, big numbers,
+//                 scale overlay, source line, end card, fade backdrops, flash, screen shake.
+//   REPLACE:      DURATION, the layout block, the story events + "story, beat by beat" block,
+//                 the simulation/drawing of the system's parts, camera keyframes, HEADS,
+//                 SOURCE text, #scale / #big1 / #big2 text, end-card "Next: ..." line.
+// Rules: every visual change lands on a spoken word via W(scene, "word"); objects live in
+// world coordinates and the camera frames the band you are talking about (fr(t, top, bottom));
+// one change per beat; every story event that matters gets an sfx() so tools/sound.py hears it.
+// =====================================================================================
+const DURATION = 82.3, FPS_SIM = 60, DT = 1 / FPS_SIM;
+const C = { paper: "#E8F0F7", muted: "#8FA9C2", signal: "#FFC247", alarm: "#FF5D47", mint: "#7FE3B8", node: "#13385B", ink: "#10304F" };
 const NS = "http://www.w3.org/2000/svg";
-const C = { paper: "#E8F0F7", muted: "#8FA9C2", signal: "#FFC247", alarm: "#FF5D47", mint: "#7FE3B8", node: "#13385B" };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 const p = (t, a, b) => clamp((t - a) / (b - a));
-const outCubic = k => 1 - Math.pow(1 - k, 3);
-const inOutCubic = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-const outQuint = k => 1 - Math.pow(1 - k, 5);
-function mix(c1, c2, k) {
-  const h = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
-  const a = h(c1), b = h(c2);
-  return "#" + a.map((v, i) => Math.round(lerp(v, b[i], clamp(k))).toString(16).padStart(2, "0")).join("");
-}
-function el(tag, attrs, parent) {
-  const e = document.createElementNS(NS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
-  (parent || document.getElementById("diagram")).appendChild(e);
-  return e;
-}
-function txt(x, y, s, attrs, parent) { const e = el("text", { x, y, ...attrs }, parent); e.textContent = s; return e; }
-const mono = (size, fill, w = 500) => ({ "font-family": "Plex Mono", "font-weight": w, "font-size": size, fill });
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const outQ = k => 1 - Math.pow(1 - k, 5);
+const outB = k => { const c1 = 1.4, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+function mix(c1, c2, k) { const h = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); const a = h(c1), b = h(c2); return "#" + a.map((v, i) => Math.round(lerp(v, b[i], clamp(k))).toString(16).padStart(2, "0")).join(""); }
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-// ---------- story state (pure functions of t) ----------
-const inScene = (t, i) => t >= S[i] && t < (S[i + 1] ?? 999);
-function inflight(t) {
-  if (t < S[1]) return 160;
-  if (t < S[3]) return 12;
-  if (t < S[4]) return Math.round(lerp(12, 162, outCubic(p(t, 20.95, 23.4))));
-  if (t < S[5]) return 172;
-  if (t < 49.75) return 12;
-  if (t < 53) return Math.round(lerp(12, 138, outCubic(p(t, 49.8, 51.4))));
-  return Math.round(lerp(138, 112, p(t, 53, 56)));
+// ---------- timing helpers (from the voiceover) ----------
+const TM = window.TIMING, SC = TM.scenes.map(s => s.start);
+SC[0] = 0;
+const SC_END = TM.scenes.map(s => s.end);
+const VOICE_END = TM.duration;
+const WORDS = []; TM.phrases.forEach((ph, i) => ph.words.forEach(w => WORDS.push({ ...w, scene: ph.scene, phrase: i })));
+function W(scene, word, nth = 0) {           // start time of the nth word in a scene that starts with `word`
+  const m = WORDS.filter(x => x.scene === scene && x.w.toLowerCase().replace(/[^a-z0-9%-]/g, "").startsWith(word.toLowerCase()));
+  if (!m.length) throw new Error("word not found: " + scene + " " + word);
+  return m[Math.min(nth, m.length - 1)].t0;
 }
-function p99ms(t) {
-  if (t < S[1]) return 3100;
-  if (t < S[3]) return 40;
-  if (t < S[4]) return lerp(40, 3100, inOutCubic(p(t, 21.5, 30)));
-  if (t < S[5]) return 3100;
-  if (t < 49.75) return 40;
-  return lerp(40, 1000, inOutCubic(p(t, 49.9, 53)));
-}
-// client patience (timer glyph) and whether the client has given up
-const clientDead = (i, t) => i === 0 && t >= 25.1 && t < S[4];
-function timerFrac(i, t) {
-  if (!inScene(t, 3)) return 1;
-  if (i === 0) return 1 - p(t, 21.0, 25.1);
-  if (i === 2) return t < 26.6 ? 1 - p(t, 21.6, 26.5) : p(t, 26.6, 27.0);
-  return 1;
-}
-const drawP = (t, start, len = 0.7) => t < S[1] ? 1 : outCubic(p(t, start, start + len));
-function diagramAlpha(t) {
-  const fadeRewind = t >= S[1] && t < 4.8 ? 1 - p(t, S[1], 4.7) : 1;
-  const end = 1 - p(t, VOICE_END, VOICE_END + 0.45);
-  return Math.min(fadeRewind, end);
-}
-const dimK = t => 1 - 0.68 * p(t, 74.3, 75.0);   // takeaway: everything but the queue dims
 
-// ---------- geometry ----------
-const QL = { x: 600, y: 560, w: 400, h: 110 };        // query layer
-const SN = { x: 600, y: 960, w: 660, h: 480 };        // storage node (hero): y 720..1200
-const CL = [640, 790, 940].map((y, i) => ({ x: 150, y, name: "abc"[i] }));
-const QY = 1086, BOX = 58, GAP = 14, QX0 = 319;      // queue row
-const slotX = s => QX0 + s * (BOX + GAP);
-const NODE_TOP = SN.y - SN.h / 2;
+// ---------- layout (world coordinates) ----------
+const PHONES = [{ x: 300, y: 455 }, { x: 515, y: 455 }, { x: 730, y: 455 }];
+const QX = 470, FRONT_Y = 1040, PITCH = 66, CARD_W = 500, CARD_H = 58, LANE_X = 860;
+const SERVER = { x: 515, y: 1140, w: 720, h: 112 };
+const RET_X = 118, RET_TOP = 372;
+const slotY = i => FRONT_Y - i * PITCH;
+const TIMEOUT = 5.0;
 
-// ---------- build diagram ----------
-const D = document.getElementById("diagram");
-function nodeBox(n) {
-  const r = el("rect", { x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 16, fill: C.node, "fill-opacity": 0, stroke: C.paper, "stroke-width": 3 });
-  return { r, len: 2 * (n.w + n.h) };
+// ---------- story events → simulation ----------
+const EV = [];                     // {t, fn}
+const SFX = [];                    // {t, kind, gain}
+const on = (t, fn) => EV.push({ t, fn });
+const sfx = (t, kind, gain = 1) => SFX.push({ t: +t.toFixed(3), kind, gain });
+
+let cardSeq = 1040;
+const cards = [];                  // all cards ever created
+let queue = [];                    // ids, index 0 = front (next to the server in FIFO)
+let policy = "FIFO";
+const responses = [];              // {t0, x0, y0, client, ok}
+function mkCard(t, client, born, opts = {}) {
+  const c = { id: cards.length, n: cardSeq++, client, born, x: PHONES[client].x, y: PHONES[client].y + 40, vx: 0, vy: 0,
+    state: "queue", t0: t, op: 0, retry: !!opts.retry, fresh: !!opts.fresh, path: null, tEnd: null, red: 0, wasStale: false, glow: !!opts.glow };
+  cards.push(c); return c;
 }
-// edges
-const edgePaths = CL.map((c, i) => {
-  const ey = QL.y + (i - 1) * 28;
-  return el("path", { d: `M${c.x + 62} ${c.y} C ${c.x + 170} ${c.y}, ${QL.x - QL.w / 2 - 110} ${ey}, ${QL.x - QL.w / 2 - 2} ${ey}`, fill: "none", stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round", opacity: .55 });
+function fill(t, ages) {           // ages listed front → back
+  on(t, T => { ages.forEach((a, i) => { const c = mkCard(T, i % 3, T - a); c.x = QX; c.y = slotY(i); c.op = 1; queue.push(c.id); }); });
+}
+function arrive(t, client, opts = {}) { on(t, T => { if (queue.length >= 8) return; const c = mkCard(T, client, T, opts); queue.push(c.id); sfx(T, "tick", .8); }); }
+function serve(t) {
+  on(t, T => {
+    if (!queue.length) return;
+    const idx = policy === "FIFO" ? 0 : queue.length - 1;
+    const id = queue.splice(idx, 1)[0], c = cards[id];
+    c.state = "toServer"; c.tS = T;
+    c.path = idx === 0 ? [[QX, SERVER.y - 10]] : [[LANE_X, c.y], [LANE_X, SERVER.y - 60], [SERVER.x + 200, SERVER.y - 10]];
+    const stale = (T - c.born) > TIMEOUT;
+    const tR = T + (idx === 0 ? .42 : .78);
+    responses.push({ t0: tR, client: c.client, ok: !stale });
+    c.wasStale = stale;
+  });
+}
+function rejectAll(t) { on(t, T => { queue.forEach(id => { const c = cards[id]; c.state = "rejected"; c.tS = T; }); queue = []; }); sfx(t, "reject", 1); }
+function burst(t, n) { for (let i = 0; i < n; i++) arrive(t + i * .028, i % 3, { retry: true }); }
+function clearAll(t) { on(t, T => { queue.forEach(id => { const c = cards[id]; c.state = "fade"; c.tS = T; }); queue = []; }); }
+const setPolicy = (t, pol) => on(t, () => { policy = pol; });
+
+// ---------- the story, beat by beat (times come from the spoken words) ----------
+const S = SC;
+// Scene 1, hook: a full, stale queue. The newest request jumps the line.
+fill(0, [9.8, 8.6, 7.1, 5.9, 4.4, 2.6, 1.2]);
+sfx(0.02, "boom", 1);
+const tNewest = W(0, "newest"), tFirst = W(0, "first");
+setPolicy(tNewest - .05, "LIFO");
+arrive(tNewest, 1, { fresh: true, glow: true });
+serve(tFirst + .1); sfx(tFirst + .1, "whoosh", .7); sfx(tFirst + .9, "chime", .7);
+clearAll(SC_END[0] + .25);
+// Scene 2: scale. Camera pulls out over the fleet; the queue idles in normal FIFO.
+setPolicy(S[1], "FIFO");
+sfx(S[1] + .05, "whoosh", 1);
+for (let t = S[1] + .5; t < S[2] - .6; t += 1.15) { arrive(t, Math.floor(rnd() * 3)); serve(t + .9); }
+sfx(W(1, "keeping"), "whoosh", .8);
+// Scene 3: normal FIFO. Short queue, everything answered.
+for (let t = S[2] + .2, k = 0; t < S[3] - .5; t += .85, k++) { arrive(t, k % 3); serve(t + .62); }
+// Scene 4: overload. Arrivals outrun service; the front goes stale; answers go nowhere.
+setPolicy(S[3], "FIFO");
+{
+  const tGave = W(3, "gave"), tRetried = W(3, "retried"), tDb = W(3, "database"), tFresh = W(3, "fresh");
+  let t = S[3] + .1, k = 0;
+  while (t < tGave) { arrive(t, k % 3); t += .42; k++; }                     // fill up fast
+  for (let s = S[3] + 1.6; s < tDb; s += 1.9) serve(s);                     // slow service
+  arrive(tRetried - .2, 0, { retry: true }); arrive(tRetried + .15, 2, { retry: true });
+  for (let s = tDb + .2; s < tFresh; s += 1.05) { serve(s); arrive(s + .5, (k++) % 3); }   // serving stale answers
+  arrive(tFresh + .1, 1, { fresh: true, glow: true });
+  for (let s = tFresh + 1.2; s < S[4] - .4; s += 1.4) { serve(s); arrive(s + .55, (k++) % 3); }
+}
+// Scene 5: the earlier trap, synchronized retries.
+{
+  const tRej = W(4, "rejected"), tAll = W(4, "all"), tOver = W(4, "overload"), tRej2 = W(4, "rejection"), tRep = W(4, "repeat");
+  rejectAll(tRej); burst(tAll + .25, 7);
+  on(tOver - .02, () => {}); sfx(tOver, "thud", .9);
+  rejectAll(tRej2); burst(tRep, 7);
+  clearAll(S[5] - .2);
+}
+// Scene 6: adapt. FIFO at normal load, flip to LIFO under pressure, in-flight on the node.
+{
+  setPolicy(S[5], "FIFO");
+  const tNormal = W(5, "normal"), tPressure = W(5, "pressure"), tFlips = W(5, "flips"), tFav = W(5, "favoring"), tLoad = W(5, "load", 1);
+  arrive(S[5] + .3, 0); arrive(S[5] + .9, 1); serve(tNormal + .1); arrive(tNormal + .6, 2); serve(tNormal + 1.1);
+  for (let i = 0; i < 7; i++) arrive(tPressure + i * .16, i % 3);
+  setPolicy(tFlips + .25, "LIFO"); sfx(tFlips + .25, "flip", 1);
+  for (let s = tFav - .3, k = 0; s < tLoad + .4; s += 1.05, k++) { serve(s); arrive(s + .45, k % 3); }
+  for (let s = tLoad + 1.4, k = 1; s < S[6] - .6; s += 1.25, k++) { serve(s); arrive(s + .5, k % 3); }
+}
+// Scene 7: the rule and the numbers (queue keeps running quietly in LIFO).
+for (let s = S[6] + .4, k = 0; s < S[7] - .6; s += 1.2, k++) { arrive(s, k % 3); serve(s + .7); }
+sfx(W(6, "eighty") - .1, "chime", 1); sfx(W(6, "seventy") - .1, "chime", .9);
+// Scene 8: takeaway, then end card.
+fill(S[7] - .01, []);
+sfx(VOICE_END + .15, "end", .9);
+
+// ---------- run the simulation once, record per-frame snapshots ----------
+EV.sort((a, b) => a.t - b.t);
+const NF = Math.ceil(DURATION * FPS_SIM) + 2;
+const FR = new Array(NF);
+{
+  let e = 0;
+  for (let f = 0; f < NF; f++) {
+    const T = f * DT;
+    while (e < EV.length && EV[e].t <= T + 1e-9) { EV[e].fn(EV[e].t); e++; }
+    queue.forEach((id, i) => { const c = cards[id]; c.tx = QX; c.ty = slotY(i); });
+    const snap = [];
+    for (const c of cards) {
+      if (c.state === "gone") continue;
+      if (c.state === "toServer") {
+        const wp = c.path[0];
+        c.tx = wp[0]; c.ty = wp[1];
+        if (Math.hypot(c.x - wp[0], c.y - wp[1]) < 26 && c.path.length > 1) c.path.shift();
+        if (c.path.length === 1 && Math.hypot(c.x - wp[0], c.y - wp[1]) < 22) { c.state = "served"; c.tS = T; }
+      }
+      if (c.state === "rejected" && T - c.tS > .32) { c.state = "leaving"; c.tS = T; c.tx = PHONES[c.client].x; c.ty = PHONES[c.client].y + 30; }
+      const k = c.state === "toServer" ? 520 : c.state === "leaving" ? 260 : 200, d = 2 * Math.sqrt(k) * (c.state === "queue" ? .9 : 1);
+      c.vx += (k * (c.tx - c.x) - d * c.vx) * DT; c.vy += (k * (c.ty - c.y) - d * c.vy) * DT;
+      c.x += c.vx * DT; c.y += c.vy * DT;
+      let op = c.state === "queue" ? clamp((T - c.t0) / .18) : 1;
+      if (c.state === "served") { op = 1 - clamp((T - c.tS) / .22); if (op <= 0) { c.state = "gone"; continue; } }
+      if (c.state === "leaving") { op = 1 - clamp((T - c.tS) / .32); if (op <= 0) { c.state = "gone"; continue; } }
+      if (c.state === "fade") { op = 1 - clamp((T - c.tS) / .3); if (op <= 0) { c.state = "gone"; continue; } }
+      snap.push([c.id, c.x, c.y, op, c.state === "rejected" || c.state === "leaving" ? 1 : 0, c.state === "served" ? 1 : 0, c.state === "toServer" ? 1 : 0]);
+    }
+    FR[f] = snap;
+  }
+}
+// serve SFX from the simulated responses
+responses.forEach(r => sfx(r.t0, r.ok ? "blip" : "thud", r.ok ? .7 : .6));
+window.SFX = SFX.sort((a, b) => a.t - b.t);
+window.DURATION = DURATION;
+
+// ---------- static world drawing ----------
+const $ = id => document.getElementById(id);
+const world = $("world"), gNodes = $("nodes"), gCards = $("cards"), gFx = $("fx"), gNotes = $("notes"), gGrid = $("grid"), gLane = $("lane");
+// fleet grid (scene 2)
+const tiles = [];
+for (let i = -15; i <= 15; i++) for (let j = -13; j <= 13; j++) {
+  const x = 515 + i * 170, y = 840 + j * 130;
+  if (Math.abs(x - 515) < 470 && Math.abs(y - 840) < 470) continue;
+  const g = el("g", { opacity: 0 }, gGrid);
+  el("rect", { x: x - 66, y: y - 34, width: 132, height: 68, rx: 12, fill: C.node, stroke: C.paper, "stroke-width": 5, "stroke-opacity": .55 }, g);
+  const d = el("circle", { cx: x - 30, cy: y, r: 9, fill: C.signal }, g);
+  tiles.push({ g, d, x, y, dist: Math.hypot(i, j), ph: rnd() });
+}
+// phones
+const phones = PHONES.map((ph, i) => {
+  const g = el("g", {}, gNodes);
+  const r = el("rect", { x: ph.x - 38, y: ph.y - 64, width: 76, height: 128, rx: 16, fill: C.node, stroke: C.paper, "stroke-width": 3.5 }, g);
+  el("line", { x1: ph.x - 12, y1: ph.y + 48, x2: ph.x + 12, y2: ph.y + 48, stroke: C.paper, "stroke-width": 3.5, "stroke-linecap": "round" }, g);
+  const lbl = el("text", { x: ph.x, y: ph.y + 10, "text-anchor": "middle", fill: C.muted, "font-family": "Plex Mono", "font-weight": 600, "font-size": 30 }, g); lbl.textContent = "abc"[i];
+  const ring = el("circle", { cx: ph.x, cy: ph.y, r: 58, fill: "none", stroke: C.mint, "stroke-width": 5, opacity: 0 }, g);
+  const x = el("text", { x: ph.x + 46, y: ph.y - 34, fill: C.alarm, "font-family": "Plex Mono", "font-weight": 600, "font-size": 40, opacity: 0 }, g); x.textContent = "✕";
+  const gone = el("text", { x: ph.x, y: ph.y + 104, "text-anchor": "middle", fill: C.muted, "font-family": "Plex Mono", "font-weight": 600, "font-size": 26, opacity: 0 }, g); gone.textContent = "gave up";
+  return { g, r, lbl, ring, x, gone };
 });
-const vEdge = el("path", { d: `M${QL.x} ${QL.y + QL.h / 2 + 2} L ${SN.x} ${NODE_TOP - 2}`, fill: "none", stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round", opacity: .55 });
-// invisible full routes for packets: client -> query layer -> storage node top
-const routes = CL.map((c, i) => {
-  const ey = QL.y + (i - 1) * 28;
-  return el("path", { d: `M${c.x + 62} ${c.y} C ${c.x + 170} ${c.y}, ${QL.x - QL.w / 2 - 110} ${ey}, ${QL.x - QL.w / 2 - 2} ${ey} M${QL.x} ${QL.y + QL.h / 2 + 2} L ${SN.x} ${NODE_TOP - 2}`, fill: "none", stroke: "none" });
-});
-// retry arcs: client -> back of the queue (node's left wall)
-const retryPaths = CL.map((c, i) => el("path", {
-  d: `M${c.x + 30} ${c.y + 40} C ${c.x + 60} ${c.y + 150 - i * 20}, ${SN.x - SN.w / 2 - 70} ${QY + 29}, ${SN.x - SN.w / 2 + 6} ${QY + 29}`,
-  fill: "none", stroke: C.alarm, "stroke-width": 2.5, "stroke-dasharray": "2 12", "stroke-linecap": "round", opacity: 0 }));
-
-// clients: small boxes with a timer glyph
-const clients = CL.map(c => {
-  const r = el("rect", { x: c.x - 60, y: c.y - 38, width: 120, height: 76, rx: 12, fill: C.node, "fill-opacity": 0, stroke: C.paper, "stroke-width": 3 });
-  const lab = txt(c.x - 38, c.y + 11, c.name, mono(30, C.paper, 600));
-  const ringBg = el("circle", { cx: c.x + 26, cy: c.y, r: 14, fill: "none", stroke: "rgba(232,240,247,0.18)", "stroke-width": 3 });
-  const ring = el("circle", { cx: c.x + 26, cy: c.y, r: 14, fill: "none", stroke: C.paper, "stroke-width": 3, transform: `rotate(-90 ${c.x + 26} ${c.y})` });
-  const hand = el("line", { x1: c.x + 26, y1: c.y, x2: c.x + 26, y2: c.y - 8, stroke: C.paper, "stroke-width": 2.5, "stroke-linecap": "round" });
-  return { r, lab, ring, ringBg, hand, len: 2 * (120 + 76) };
-});
-const clientsLabel = txt(90, 582, "clients", mono(28, C.muted));
-
-// query layer
-const qlN = nodeBox(QL);
-const qlT = txt(QL.x - QL.w / 2 + 30, QL.y - 4, "query layer", mono(42, C.paper, 600));
-const qlS = txt(QL.x - QL.w / 2 + 30, QL.y + 36, "stateless", mono(29, C.muted));
-const qlG = el("g", {});
-el("path", { d: `M${QL.x + 120} ${QL.y - 14} h44 m-10 -9 l10 9 l-10 9`, fill: "none", stroke: C.paper, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, qlG);
-el("path", { d: `M${QL.x + 164} ${QL.y + 14} h-44 m10 -9 l-10 9 l10 9`, fill: "none", stroke: C.paper, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, qlG);
-
-// storage node (hero)
-const snN = nodeBox(SN);
-const L0 = SN.x - SN.w / 2 + 30;
-const snT = txt(L0, NODE_TOP + 56, "docstore node", mono(42, C.paper, 600));
-const snSub = txt(L0, NODE_TOP + 98, "", mono(29, C.muted));
-const snIn = txt(L0, NODE_TOP + 142, "", mono(29, C.muted));
-const snP99 = txt(SN.x + 20, NODE_TOP + 142, "", mono(29, C.muted));
-const gDb = el("g", {});
-el("ellipse", { cx: SN.x + SN.w / 2 - 62, cy: NODE_TOP + 34, rx: 21, ry: 7, fill: "none", stroke: C.paper, "stroke-width": 3 }, gDb);
-el("path", { d: `M${SN.x + SN.w / 2 - 83} ${NODE_TOP + 34} v40 a21 7 0 0 0 42 0 v-40`, fill: "none", stroke: C.paper, "stroke-width": 3 }, gDb);
-const meterBg = el("rect", { x: L0, y: NODE_TOP + 160, width: SN.w - 60, height: 10, rx: 5, fill: "rgba(232,240,247,0.14)" });
-const meter = el("rect", { x: L0, y: NODE_TOP + 160, width: 10, height: 10, rx: 5, fill: C.paper });
-// queue order arrow + labels
-const AY = 1008;
-const arrowG = el("g", {});
-const arrowLine = el("path", { d: `M380 ${AY} H820 m-14 -10 l14 10 l-14 10`, fill: "none", stroke: C.paper, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, arrowG);
-const orderLab = txt(600, AY - 14, "FIFO", { ...mono(26, C.paper, 600), "text-anchor": "middle" });
-const backLab = txt(QX0, 1176, "back", mono(22, C.muted));
-const frontLab = txt(slotX(7) + BOX, 1176, "front", { ...mono(22, C.muted), "text-anchor": "end" });
-
-// ---------- notes: numbered amber markers ----------
-const notes = document.getElementById("notes");
-function marker(x, y, n) {
-  const g = el("g", { opacity: 0 }, notes);
-  el("circle", { cx: x, cy: y, r: 19, fill: "#10304F", stroke: C.signal, "stroke-width": 3 }, g);
-  txt(x, y + 8, n, { "text-anchor": "middle", ...mono(24, C.signal, 600) }, g);
+// response lane: answers travel back up the left side, never across the queue
+const retPaths = PHONES.map(ph => el("path", { d: `M${SERVER.x - SERVER.w / 2 + 10} ${SERVER.y} L${RET_X} ${SERVER.y - 40} L${RET_X} ${RET_TOP} L${ph.x} ${RET_TOP} L${ph.x} ${ph.y - 66}`, fill: "none", stroke: "none" }, gLane));
+const retLane = el("path", { d: `M${SERVER.x - SERVER.w / 2 + 10} ${SERVER.y} L${RET_X} ${SERVER.y - 40} L${RET_X} ${RET_TOP} L${PHONES[2].x} ${RET_TOP}`, fill: "none", stroke: C.muted, "stroke-width": 2.5, "stroke-dasharray": "3 12", "stroke-linecap": "round", opacity: .45 }, gLane);
+const retLens = retPaths.map(pa => pa.getTotalLength());
+// server: name + policy pill on top, load meter, in-flight and p99 on the bottom row
+const SX0 = SERVER.x - SERVER.w / 2, SX1 = SERVER.x + SERVER.w / 2, SY0 = SERVER.y - SERVER.h / 2;
+const srv = el("g", {}, gNodes);
+const srvR = el("rect", { x: SX0, y: SY0, width: SERVER.w, height: SERVER.h, rx: 18, fill: C.node, stroke: C.paper, "stroke-width": 4 }, srv);
+const srvName = el("text", { x: SX0 + 30, y: SY0 + 46, fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 38 }, srv); srvName.textContent = "docstore node";
+const meterBg = el("rect", { x: SX0 + 30, y: SY0 + 60, width: 330, height: 8, rx: 4, fill: "rgba(232,240,247,.14)" }, srv);
+const meter = el("rect", { x: SX0 + 30, y: SY0 + 60, width: 10, height: 8, rx: 4, fill: C.paper }, srv);
+const srvIF = el("text", { x: SX0 + 30, y: SY0 + 100, fill: C.muted, "font-family": "Plex Mono", "font-size": 29 }, srv);
+const srvP99 = el("text", { x: SX1 - 30, y: SY0 + 100, "text-anchor": "end", fill: C.muted, "font-family": "Plex Mono", "font-size": 29 }, srv);
+const pill = el("g", {}, srv);
+gCards.parentNode.insertBefore(srv, gCards.nextSibling); // cards slide under the node: absorbed, never on top of its label
+const pillR = el("rect", { x: SX1 - 30 - 140, y: SY0 + 16, width: 140, height: 42, rx: 21, fill: C.ink, stroke: C.paper, "stroke-width": 3 }, pill);
+const pillT = el("text", { x: SX1 - 30 - 70, y: SY0 + 45, "text-anchor": "middle", fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 25 }, pill);
+const srvTag = el("text", { x: SERVER.x, y: SERVER.y - SERVER.h / 2 - 34, "text-anchor": "middle", fill: C.alarm, "font-family": "Plex Mono", "font-size": 28, opacity: 0 }, gNodes); srvTag.textContent = "";
+const ring = el("circle", { cx: SERVER.x, cy: SERVER.y, r: 100, fill: "none", stroke: C.alarm, "stroke-width": 4, opacity: 0 }, gFx);
+const ptr = el("path", { d: "M0 0 L-24 -15 L-24 15 Z", fill: C.signal }, gNotes);
+// express lane (LIFO): the newest card skips the line on the right
+const laneP = el("path", { d: `M${LANE_X} ${slotY(7) - 10} L${LANE_X} ${SY0 - 30} Q${LANE_X} ${SERVER.y - 20} ${SX1 - 40} ${SERVER.y - 20}`, fill: "none", stroke: C.signal, "stroke-width": 5, "stroke-dasharray": "4 16", "stroke-linecap": "round", opacity: 0 }, gLane);
+// numbered markers
+function marker(n, x, y, label, lx, ly, anchor = "middle") {
+  const g = el("g", { opacity: 0 }, gNotes);
+  el("circle", { cx: x, cy: y, r: 24, fill: C.ink, stroke: C.signal, "stroke-width": 3.5 }, g);
+  const t = el("text", { x, y: y + 9, "text-anchor": "middle", fill: C.signal, "font-family": "Plex Mono", "font-weight": 600, "font-size": 28 }, g); t.textContent = n;
+  if (label) { const l = el("text", { x: lx, y: ly, "text-anchor": anchor, fill: C.signal, "font-family": "ArchivoV", "font-weight": 700, "font-size": 36 }, g); l.textContent = label; }
   return g;
 }
-const mFlip = marker(340, AY - 6, "1");
-const mMeas = marker(340, 928, "2");
-const lMeas = txt(372, 938, "measure in‑flight, on the node", { fill: C.signal, "font-family": "ArchivoV", "font-weight": 700, "font-size": 30, opacity: 0 }, notes);
-const lForm = txt(372, 968, "concurrency = throughput × latency", { ...mono(22, C.muted), opacity: 0 }, notes);
-// failure ring around the queue + error badges
-const ring = el("ellipse", { cx: 600, cy: QY + 29, rx: 300, ry: 50, fill: "none", stroke: C.alarm, "stroke-width": 3, opacity: 0 }, notes);
-const badges = []; for (let k = 0; k < 12; k++) badges.push(txt(0, 0, "429", { ...mono(30, C.alarm, 600), opacity: 0 }, notes));
-
-// ---------- below the diagram: metric line, result rows, source line ----------
-const below = document.getElementById("below");
-const scaleLine = txt(80, 1262, "tens of millions req/s · thousands of clusters", { ...mono(29, C.paper), opacity: 0 }, below);
-function row(y, label, a, b) {
-  const t = el("text", { x: 80, y, ...mono(29, C.paper), opacity: 0 }, below);
-  const s1 = el("tspan", { fill: C.paper }, t); s1.textContent = label;
-  const s2 = el("tspan", { fill: C.muted }, t); s2.textContent = a;
-  const s3 = el("tspan", { fill: C.paper }, t); s3.textContent = " → ";
-  const s4 = el("tspan", { fill: C.mint, "font-weight": 600 }, t); s4.textContent = b;
-  return t;
-}
-const row1 = row(1250, "throughput under overload: ", "3,000", "5,400 QPS avg");
-const row2 = row(1292, "p99 upsert: ", "3.1 s", "1.0 s");
-const srcLine = txt(80, 1334, SOURCE, { ...mono(22, C.muted), opacity: 0 }, below);
-
-// ---------- queue simulation (precomputed, deterministic) ----------
-const QG = document.getElementById("queue");
-const BOXES = [], REQS = [], RESPS = [], REJECTS = [];
-function newBox(t, props) { const b = { kf: [{ t, slot: 0, lift: 0, col: C.signal, fillOp: 0.22, dash: false, op: 1, ...props }], pulse: null }; BOXES.push(b); return b; }
-const key = (b, t, props) => b.kf.push({ t, ...props });
-const MOVE = 0.32;
-const EV = [];
-const ev = (t, type, o = {}) => EV.push({ t, type, ...o });
-
-// scene 1 (hook): full overloaded queue; the newest request jumps to the front
-for (let i = 0; i < 8; i++) ev(-1, "arr", { c: i % 3, nodot: true });
-ev(1.0, "arr", { c: 1, hook: true });
-ev(4.5, "clear");
-// scenes 2-3: normal load, FIFO, short queue
-const pat = [1, 0, 2, 1, 2, 0];
-for (let k = 0, t = 6.4; t <= 19.9; k++, t += 0.55) { ev(t, "arr", { c: pat[k % 6] }); ev(t + 1.0, "srv", { mode: "fifo" }); }
-// scene 4: overload under FIFO
-[[20.95, 1], [21.3, 0], [21.65, 0], [22.0, 2], [22.35, 1], [22.7, 1], [23.05, 1], [23.4, 1]].forEach(([t, c]) => ev(t, "arr", { c }));
-ev(23.9, "srv", { mode: "fifo" });
-ev(25.1, "abandon", { c: 0 });
-ev(26.6, "abandon", { c: 2 });                       // c retries: its old request is orphaned
-ev(27.2, "arr", { c: 2, retry: 0.6 });
-ev(28.7, "srv", { mode: "fifo" });
-ev(30.1, "srv", { mode: "fifo" });
-ev(30.9, "arr", { c: 1 });
-ev(32.2, "arr", { c: 1, pulse: [32.6, 35.6] });
-ev(S[4], "clear");
-// scene 5: the earlier version — fixed wait, synchronized rejection and retries
-for (let i = 0; i < 8; i++) ev(35.95 + i * 0.06, "arr", { c: i % 3, nodot: true });
-[[39.3, 40.6, 0.6], [42.35, 42.55, 0.4], [43.4, 43.6, 0.35]].forEach(([rej, fire, dur]) => {
-  ev(rej, "reject");
-  for (let i = 0; i < 8; i++) ev(fire + dur + Math.floor(i / 3) * 0.08 + (i % 3) * 0.02, "arr", { c: i % 3, retry: dur });
-});
-ev(S[5], "clear");
-// scene 6: normal load FIFO, then pressure -> flip to LIFO
-for (let k = 0, t = 45.7; t <= 49.3; k++, t += 0.6) { ev(t, "arr", { c: pat[k % 6] }); ev(t + 0.9, "srv", { mode: "fifo" }); }
-for (let k = 0, t = 49.8; t <= 51.7; k++, t += 0.27) ev(t, "arr", { c: pat[(k + 2) % 6], cap: 7 });
-ev(52.4, "arr", { c: 1 }); ev(53.0, "srv", { mode: "lifo" });
-ev(53.7, "arr", { c: 2 }); ev(54.3, "srv", { mode: "lifo" });
-for (let k = 0, t = 55.3; t <= 73.2; k++, t += 1.1) { ev(t, "arr", { c: [1, 2, 0][k % 3] }); ev(t + 0.55, "srv", { mode: "lifo" }); }
-// scene 8: takeaway — newest box at the front
-ev(74.2, "arr", { c: 1, nodot: false, final: true });
-
-EV.sort((a, b) => a.t - b.t);
-let Q = [];  // index 0 = front (oldest)
-const layout = t => Q.forEach((b, i) => key(b, t, { slot: 7 - i }));
-let FINAL = null;
-for (const e of EV) {
-  const t = e.t;
-  if (e.type === "arr") {
-    if (Q.length >= (e.cap || 8)) continue;
-    const dur = e.retry || 0.7;
-    if (!e.nodot) REQS.push({ t0: t - dur, t1: t, c: e.c, retry: !!e.retry });
-    if (e.hook) {
-      const b = newBox(t, { slot: 0, lift: -66, client: e.c });
-      key(b, 1.7, { slot: 7 }); key(b, 2.6, { slot: 7.7, op: 0 });
-      RESPS.push({ t0: 2.7, t1: 3.4, c: e.c });
-      continue;
-    }
-    if (e.final) {
-      const b = newBox(t, { slot: 0, lift: -66, client: e.c, fillOp: 1 });
-      key(b, 74.7, { slot: 7 });
-      FINAL = b; continue;
-    }
-    const b = newBox(t, { slot: 0, client: e.c });
-    if (e.pulse) b.pulse = e.pulse;
-    Q.push(b); key(b, t + 0.12, { slot: 7 - (Q.length - 1) });
-  } else if (e.type === "srv") {
-    if (!Q.length) continue;
-    if (e.mode === "fifo") {
-      const b = Q.shift();
-      key(b, t, { slot: 7.7, op: 0 });
-      RESPS.push({ t0: t + 0.15, t1: t + 0.85, c: b.kf[0].client });
-      layout(t + 0.1);
-    } else {
-      const b = Q.pop();
-      key(b, t, { lift: -66 }); key(b, t + 0.3, { slot: 7 }); key(b, t + 0.62, { slot: 7.7, op: 0 });
-      RESPS.push({ t0: t + 0.7, t1: t + 1.4, c: b.kf[0].client });
-    }
-  } else if (e.type === "abandon") {
-    Q.filter(b => b.kf[0].client === e.c).forEach(b => key(b, t, { col: C.muted, dash: true, fillOp: 0 }));
-  } else if (e.type === "reject") {
-    Q.forEach(b => { key(b, t, { col: C.alarm, fillOp: 0.25 }); key(b, t + 0.38, { op: 0 }); });
-    REJECTS.push(t); Q = [];
-  } else if (e.type === "clear") {
-    Q.forEach(b => key(b, t, { op: 0 })); Q = [];
+const m1 = marker("1", LANE_X, slotY(7) - 46, null);
+const m2 = marker("2", SERVER.x, SY0 + 90, "measure in-flight, on the node", SERVER.x, SERVER.y + SERVER.h / 2 + 52);
+const qps = el("g", { opacity: 0 }, gNotes);
+{ const t = el("text", { x: SERVER.x, y: SERVER.y + SERVER.h / 2 + 96, "text-anchor": "middle", fill: C.muted, "font-family": "Plex Mono", "font-size": 30 }, qps); t.textContent = "not queries per second";
+  el("line", { x1: SERVER.x - 190, y1: SERVER.y + SERVER.h / 2 + 86, x2: SERVER.x + 190, y2: SERVER.y + SERVER.h / 2 + 86, stroke: C.alarm, "stroke-width": 3 }, qps); }
+// card pool
+const pool = [];
+function cardEl(i) {
+  while (pool.length <= i) {
+    const g = el("g", {}, gCards);
+    const halo = el("rect", { x: -CARD_W / 2 - 6, y: -CARD_H / 2 - 6, width: CARD_W + 12, height: CARD_H + 12, rx: 16, fill: "none", stroke: C.signal, "stroke-width": 6, filter: "url(#soft)", opacity: 0 }, g);
+    const r = el("rect", { x: -CARD_W / 2, y: -CARD_H / 2, width: CARD_W, height: CARD_H, rx: 12, fill: C.node, stroke: C.paper, "stroke-width": 3 }, g);
+    const bar = el("rect", { x: -CARD_W / 2 + 3, y: CARD_H / 2 - 9, width: 10, height: 6, rx: 3, fill: C.signal }, g);
+    const a = el("text", { x: -CARD_W / 2 + 22, y: 11, fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 28 }, g);
+    const b = el("text", { x: CARD_W / 2 - 22, y: 11, "text-anchor": "end", fill: C.paper, "font-family": "Plex Mono", "font-weight": 600, "font-size": 28 }, g);
+    pool.push({ g, halo, r, bar, a, b });
   }
+  return pool[i];
 }
-// scene 8: whole queue turns amber; the newest box sits at the front
-Q.forEach(b => key(b, 74.4, { col: C.signal, dash: false, fillOp: 0.22 }));
-BOXES.forEach(b => b.kf.sort((a, c) => a.t - c.t));
-const boxEls = BOXES.map(() => el("rect", { width: BOX, height: BOX, rx: 8, "stroke-width": 3 }, QG));
-function boxState(b, t) {
-  if (t < b.kf[0].t) return null;
-  let cur = {}, prev = null, last = 0;
-  for (let i = 0; i < b.kf.length && b.kf[i].t <= t; i++) { prev = { ...cur }; cur = { ...cur, ...b.kf[i] }; last = i; }
-  if (last === 0) prev = { ...cur, op: 0 };
-  const k = outCubic(p(t, b.kf[last].t, b.kf[last].t + MOVE));
-  return {
-    slot: lerp(prev.slot, cur.slot, k), lift: lerp(prev.lift, cur.lift, k), op: lerp(prev.op, cur.op, last === 0 ? p(t, b.kf[0].t, b.kf[0].t + 0.2) : k),
-    col: mix(prev.col, cur.col, k), fillOp: lerp(prev.fillOp, cur.fillOp, k), dash: cur.dash,
-  };
+const dotPool = [];
+function dotEl(i) { while (dotPool.length <= i) { const g = el("g", {}, gFx); const c = el("circle", { r: 13, fill: C.mint, filter: "url(#glow)" }, g); const x = el("text", { "font-family": "Plex Mono", "font-weight": 600, "font-size": 30, fill: C.muted, "text-anchor": "middle" }, g); x.textContent = "✕ nobody waiting"; dotPool.push({ g, c, x }); } return dotPool[i]; }
+
+// ---------- HTML overlays ----------
+const HEADS = [
+  [0, "The newest request goes first."],
+  [1, "One node out of thousands."],
+  [2, "First in, first out."],
+  [3, "Serving answers nobody wants."],
+  [4, "Fixed waits. Synced retries."],
+  [5, "Measure in-flight. Flip to LIFO."],
+  [6, "Shed load where the state lives."],
+  [7, "Fair to the oldest. Unfair to all."],
+];
+const headEls = HEADS.map(([s, txt]) => { const d = document.createElement("div"); d.className = "headline"; if (s === 7) d.innerHTML = "Fair to the oldest.<br>Unfair to all."; else d.textContent = txt; $("heads").appendChild(d); return d; });
+const capEl = $("caption");
+const PH = TM.phrases.map(ph => ({ ...ph, words: ph.words.map(w => ({ ...w, w: w.w.replace("P-ninety-nine", "P99") })) }));
+let lastPh = -1, spans = [];
+
+// ---------- camera keyframes [t, cx, cy, zoom] ----------
+const K = [];
+// fr(top, bottom): frame a world band so it fills the stage window (screen y 340..1250), capped zoom
+function fr(t, top, bottom, cx = 515, zmax = 1.28) {
+  let z = 910 / (bottom - top), cy;
+  if (z > zmax) { z = zmax; cy = (top + bottom) / 2 + 25 / z; } else cy = top + 480 / z;
+  K.push([t, cx, cy, z]);
 }
+const cam = (t, cx, cy, z) => K.push([t, cx, cy, z]);
+const ALL = [385, 1215], QS = [540, 1215], FRONT = [800, 1215], BACK = [372, 860], SRV = [1020, 1290];
+fr(0, ...QS); fr(SC_END[0], 560, 1215);
+fr(S[1] + .1, 560, 1215); cam(S[1] + 1.4, 515, 830, .21); cam(W(1, "keeping") - .1, 515, 830, .21); fr(W(1, "keeping") + 1.6, ...ALL);
+fr(S[2], ...ALL); fr(S[3] - .1, ...ALL);
+fr(W(3, "oldest") - .2, ...ALL); fr(W(3, "oldest") + .9, ...FRONT);
+fr(W(3, "clients") - .2, ...FRONT); fr(W(3, "clients") + .9, ...ALL);
+fr(W(3, "database") - .3, ...ALL); fr(W(3, "database") + .8, ...QS);
+fr(W(3, "fresh") - .3, ...QS); fr(W(3, "fresh") + 1.0, ...BACK);
+fr(S[4] - .2, ...BACK); fr(S[4] + .9, ...ALL);
+fr(S[5], ...ALL); fr(W(5, "flips") - .1, ...ALL); fr(W(5, "flips") + 1.0, 520, 1215, 530);
+fr(W(5, "load", 1) - .2, 520, 1215, 530); fr(W(5, "load", 1) + 1.1, ...SRV, 515, 1.3);
+fr(W(5, "queries") + .4, ...SRV, 515, 1.3); fr(W(5, "queries") + 1.3, ...ALL);
+fr(S[6], ...ALL); cam(S[7], 515, 860, 1.0); cam(DURATION, 515, 860, .96);
+K.sort((a, b) => a[0] - b[0]);
+function camera(t) {
+  let i = 0; while (i < K.length - 1 && K[i + 1][0] <= t) i++;
+  const a = K[i], b = K[Math.min(i + 1, K.length - 1)];
+  const k = b[0] === a[0] ? 1 : ease(clamp((t - a[0]) / (b[0] - a[0])));
+  // interpolate zoom in log space so zooms feel even
+  return [lerp(a[1], b[1], k), lerp(a[2], b[2], k), Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), k))];
+}
+const ANCHOR = [515, 820];
 
-// ---------- packets ----------
-const PK = document.getElementById("packets");
-const pool = []; const dot = i => { while (pool.length <= i) pool.push(el("circle", { r: 6 }, PK)); return pool[i]; };
-const routeLen = routes.map(r => r.getTotalLength()), retryLen = retryPaths.map(r => r.getTotalLength());
-
-// ---------- HTML text layers ----------
-const titlesEl = document.getElementById("titles"), capsEl = document.getElementById("captions");
-const titleNodes = TITLES.map(([a, b, s]) => { const d = document.createElement("div"); d.className = "title"; d.textContent = s; titlesEl.appendChild(d); return d; });
-const capNodes = CAPTIONS.map(([a, b, s]) => { const d = document.createElement("div"); d.className = "caption"; d.textContent = s; capsEl.appendChild(d); return d; });
-const clockEl = document.getElementById("clock"), endEl = document.getElementById("endcard");
-
-function setDraw(e, len, k) { e.setAttribute("stroke-dasharray", `${len} ${len}`); e.setAttribute("stroke-dashoffset", len * (1 - k)); }
-const edgeLens = new Map(); [...edgePaths, vEdge].forEach(e => edgeLens.set(e, e.getTotalLength()));
-const fmtMs = v => v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(1)} s`;
-
-// ---------- render(t): everything on screen is a function of t ----------
+// ---------- render(t) ----------
 function render(t) {
-  const A = diagramAlpha(t), dim = dimK(t);
-  D.setAttribute("opacity", A * dim);
-  PK.setAttribute("opacity", A * dim);
-  notes.setAttribute("opacity", A * dim);
-  QG.setAttribute("opacity", A);
+  const f = Math.min(NF - 1, Math.max(0, Math.round(t * FPS_SIM)));
+  const scene = SC.reduce((s, st, i) => t >= st ? i : s, 0);
+  const endK = p(t, VOICE_END + .1, VOICE_END + .6);
 
-  // pen-draw (scene 2), already drawn in the hook
-  clients.forEach((c, i) => {
-    const k = drawP(t, 4.8 + i * 0.1);
-    setDraw(c.r, c.len, k); c.r.setAttribute("fill-opacity", drawP(t, 5.2));
-    const dead = clientDead(i, t);
-    c.r.setAttribute("stroke", dead ? C.muted : C.paper);
-    if (dead) { c.r.setAttribute("stroke-dasharray", "10 10"); c.r.removeAttribute("stroke-dashoffset"); }
-    const f = timerFrac(i, t), circ = 2 * Math.PI * 14;
-    const tc = dead ? C.muted : f < 0.35 ? C.alarm : C.paper;
-    c.ring.setAttribute("stroke-dasharray", `${circ * f} ${circ}`); c.ring.setAttribute("stroke", tc);
-    const ang = (1 - f) * 2 * Math.PI;
-    c.hand.setAttribute("x2", CL[i].x + 26 + 8 * Math.sin(ang)); c.hand.setAttribute("y2", CL[i].y - 8 * Math.cos(ang)); c.hand.setAttribute("stroke", tc);
-    [c.lab, c.ring, c.ringBg, c.hand].forEach(e => e.setAttribute("opacity", drawP(t, 5.0 + i * 0.1, 0.4)));
-    c.lab.setAttribute("fill", dead ? C.muted : C.paper);
+  // camera with a short shake on rejections
+  let [cx, cy, z] = camera(t);
+  let shake = 0; for (const e of SFX) if (e.kind === "reject" && t >= e.t && t < e.t + .4) shake = Math.max(shake, (1 - (t - e.t) / .4) * 10);
+  const sx = Math.sin(t * 80) * shake, sy = Math.cos(t * 67) * shake * .6;
+  world.setAttribute("transform", `translate(${ANCHOR[0] + sx} ${ANCHOR[1] + sy}) scale(${z}) translate(${-cx} ${-cy})`);
+  const worldDim = scene === 6 ? 1 - .78 * p(t, W(6, "uber") - .4, W(6, "uber") + .3) : scene === 7 ? .35 + .65 * (1 - p(t, S[7], S[7] + .6)) : 1;
+  world.setAttribute("opacity", worldDim * (1 - endK));
+
+  // fleet grid
+  const gA = p(t, S[1] + .4, S[1] + 1.6) * (1 - p(t, W(1, "keeping"), W(1, "keeping") + 1.2));
+  const sAg = p(t, W(1, "tens") - .4, W(1, "tens") + .2) * (1 - p(t, W(1, "keeping") - .3, W(1, "keeping") + .2));
+  gGrid.setAttribute("opacity", gA * (1 - .78 * sAg));
+  if (gA > 0) tiles.forEach(tl => { const k = p(t, S[1] + .4 + tl.dist * .045, S[1] + .9 + tl.dist * .045); tl.g.setAttribute("opacity", k);
+    const ph = (t * .9 + tl.ph) % 1; tl.d.setAttribute("cx", tl.x - 44 + 88 * ph); });
+
+  // load model for the server metrics (derived from the queue)
+  const qLen = FR[f].filter(s => s[4] === 0 && s[5] === 0 && s[6] === 0).length;
+  const overloaded = qLen >= 5;
+  const inflight = Math.round(12 + qLen * 21 + (overloaded ? 6 * Math.sin(t * 3) : 0));
+  srvIF.textContent = `in-flight ${inflight}`;
+  const p99 = scene <= 2 ? (scene === 0 ? "3.1 s" : "40 ms") : scene === 3 ? (qLen > 5 ? "1.8 s" : "220 ms") : scene === 4 ? "3.1 s" : scene === 5 ? (t < W(5, "flips") ? (qLen > 4 ? "2.4 s" : "40 ms") : "1.0 s") : "1.0 s";
+  srvP99.textContent = `p99 ${p99}`;
+  const hot = clamp((qLen - 3) / 4);
+  meter.setAttribute("width", 10 + 320 * clamp(qLen / 7));
+  meter.setAttribute("fill", mix(C.paper, C.alarm, hot));
+  srvIF.setAttribute("fill", hot > .5 ? C.alarm : C.muted); srvP99.setAttribute("fill", p99.endsWith(" s") && p99 !== "1.0 s" ? C.alarm : p99 === "1.0 s" ? C.mint : C.muted);
+  const pulse = hot > .6 ? .5 + .5 * Math.sin(t * 9) : 0;
+  srvR.setAttribute("stroke", scene === 7 ? C.signal : mix(C.paper, C.alarm, hot * (.6 + .4 * pulse)));
+  srvTag.setAttribute("opacity", scene === 4 ? p(t, S[4] + .3, S[4] + .7) * (1 - p(t, S[5] - .4, S[5])) : 0);
+
+  // policy pill and next pointer
+  const pol = (t >= W(5, "flips") + .25 && t < S[7] + 99) || (t >= W(0, "newest") - .05 && t < S[1]) ? "LIFO" : "FIFO";
+  const flipK = p(t, W(5, "flips") + .2, W(5, "flips") + .7);
+  pillT.textContent = pol === "LIFO" ? "LIFO under pressure" : "FIFO";
+  const pw = pol === "LIFO" ? 320 : 120;
+  pillR.setAttribute("width", pw); pillR.setAttribute("x", SX1 - 30 - pw); pillT.setAttribute("x", SX1 - 30 - pw / 2);
+  pillR.setAttribute("stroke", pol === "LIFO" ? C.signal : C.paper); pillT.setAttribute("fill", pol === "LIFO" ? C.signal : C.paper);
+  const pcx = SX1 - 30 - pw / 2;
+  pill.setAttribute("transform", flipK > 0 && flipK < 1 ? `translate(${pcx} 0) scale(${Math.max(.05, Math.abs(Math.cos(flipK * Math.PI)))} 1) translate(${-pcx} 0)` : "");
+  pill.setAttribute("opacity", scene === 1 ? 1 - gA : 1);
+  const qIdx = FR[f].filter(s => s[4] === 0 && s[5] === 0 && s[6] === 0);
+  if (qIdx.length) {
+    const target = pol === "FIFO" ? qIdx.reduce((a, b) => b[2] > a[2] ? b : a) : qIdx.reduce((a, b) => b[2] < a[2] ? b : a);
+    ptr.setAttribute("transform", `translate(${QX - CARD_W / 2 - 18 + Math.sin(t * 6) * 4} ${target[2]})`); ptr.setAttribute("opacity", scene === 7 ? 0 : 1);
+  } else ptr.setAttribute("opacity", 0);
+
+  // express lane
+  const laneK = pol === "LIFO" ? (t < S[1] ? p(t, W(0, "newest"), W(0, "newest") + .5) : p(t, W(5, "flips") + .25, W(5, "flips") + 1.0)) : 0;
+  laneP.setAttribute("opacity", laneK > 0 ? .9 : 0);
+  laneP.setAttribute("stroke-dashoffset", -t * 40);
+
+  // markers
+  m1.setAttribute("opacity", scene === 5 ? flipK * (1 - p(t, W(5, "load", 1) - .3, W(5, "load", 1))) : 0);
+  m2.setAttribute("opacity", scene === 5 ? p(t, W(5, "load", 1), W(5, "load", 1) + .4) : 0);
+  qps.setAttribute("opacity", scene === 5 ? p(t, W(5, "queries"), W(5, "queries") + .3) : 0);
+
+  // cards
+  const snap = FR[f];
+  const staleBy = [false, false, false];
+  snap.forEach((s, i) => {
+    const [id, x, y, op, red, served, moving] = s, c = cards[id], e = cardEl(i);
+    const age = Math.max(0, t - c.born);
+    const stale = age > TIMEOUT && !served && !red;
+    if (stale && !moving) staleBy[c.client] = true;
+    const fresh = c.glow && age < 6;
+    const viaLane = moving && x > QX + 120;
+    const sc = red ? .3 + .7 * op : served ? .55 : viaLane ? .56 : moving ? .8 : 1;
+    e.g.setAttribute("transform", `translate(${x} ${y}) scale(${sc})`); e.g.setAttribute("opacity", op * (scene === 7 && !fresh ? .5 : 1));
+    e.a.textContent = (c.retry ? "↻ " : "") + `read #${c.n}`;
+    e.b.textContent = stale ? "client gone" : `${age.toFixed(1)} s`;
+    const col = red ? C.alarm : (served || moving) ? (c.wasStale ? C.muted : C.mint) : stale ? C.muted : fresh ? C.signal : mix(C.paper, C.signal, clamp((age - 2) / 3));
+    e.r.setAttribute("stroke", col); e.r.setAttribute("stroke-dasharray", stale ? "10 10" : "none");
+    e.r.setAttribute("fill", stale ? "#0F2C48" : C.node);
+    e.a.setAttribute("fill", stale ? C.muted : C.paper); e.b.setAttribute("fill", stale ? C.muted : col === C.paper ? C.paper : col);
+    e.bar.setAttribute("width", Math.max(6, (CARD_W - 6) * clamp(age / TIMEOUT))); e.bar.setAttribute("fill", stale ? C.muted : col);
+    e.bar.setAttribute("opacity", stale ? .35 : .9);
+    e.halo.setAttribute("opacity", fresh ? .55 + .45 * Math.sin(t * 7) : 0);
   });
-  clientsLabel.setAttribute("opacity", drawP(t, 4.9));
-  edgePaths.forEach((e, i) => setDraw(e, edgeLens.get(e), drawP(t, 5.1 + i * 0.06)));
-  setDraw(qlN.r, qlN.len, drawP(t, 5.25)); qlN.r.setAttribute("fill-opacity", drawP(t, 5.6));
-  [qlT, qlS, qlG].forEach(e => e.setAttribute("opacity", drawP(t, 5.6, 0.4)));
-  setDraw(vEdge, edgeLens.get(vEdge), drawP(t, 5.45));
-  setDraw(snN.r, snN.len, drawP(t, 5.6, 0.9)); snN.r.setAttribute("fill-opacity", drawP(t, 6.0));
-  [snT, gDb, snIn, snP99, meterBg, meter].forEach(e => e.setAttribute("opacity", drawP(t, 6.0, 0.4)));
+  for (let i = snap.length; i < pool.length; i++) pool[i].g.setAttribute("opacity", 0);
+  phones.forEach((ph, i) => { ph.x.setAttribute("opacity", staleBy[i] ? 1 : 0); ph.r.setAttribute("stroke", staleBy[i] ? C.muted : C.paper); ph.r.setAttribute("stroke-dasharray", staleBy[i] ? "8 8" : "none"); ph.gone.setAttribute("opacity", 0); ph.ring.setAttribute("opacity", 0); });
+  retLane.setAttribute("opacity", scene === 1 ? .45 * (1 - gA) : .45);
 
-  // node sub line
-  let sub = "", subA = 0;
-  if (t >= 5.9 && t < S[2]) { sub = "Docstore · Schemaless"; subA = p(t, 5.9, 6.3) * (1 - p(t, 15.0, 15.28)); }
-  if (t >= 35.9 && t < S[5]) { sub = "earlier version: fixed wait"; subA = p(t, 35.9, 36.3) * (1 - p(t, 45.1, 45.37)); }
-  snSub.textContent = sub; snSub.setAttribute("opacity", subA);
-
-  // in-flight meter + p99
-  const v = inflight(t), amb = p(v, 40, 100), red = p(v, 145, 160);
-  const mcol = mix(mix(C.paper, C.signal, amb), C.alarm, red);
-  meter.setAttribute("width", Math.max(10, (SN.w - 60) * Math.min(1, v / 175)));
-  meter.setAttribute("fill", mcol);
-  snIn.textContent = `in‑flight ${v}`; snIn.setAttribute("fill", red > 0.5 ? C.alarm : amb > 0.5 ? C.signal : C.muted);
-  const lat = p99ms(t);
-  snP99.textContent = `p99 ${fmtMs(lat)}`; snP99.setAttribute("fill", lat > 2000 ? C.alarm : C.muted);
-  const pulse = red > 0.6 ? 0.5 + 0.5 * Math.sin(t * 9) : 0;
-  const emph = p(t, 74.3, 75.0);
-  snN.r.setAttribute("stroke", mix(C.paper, C.alarm, red * (0.55 + 0.45 * pulse)));
-
-  // order arrow (scene 3 on), flips at 50.6
-  const arA = t < S[1] ? 0 : drawP(t, 15.6, 0.6);
-  const flip = outCubic(p(t, 50.6, 51.1));
-  arrowG.setAttribute("opacity", arA); orderLab.setAttribute("opacity", arA * (flip > 0 && flip < 1 ? Math.abs(1 - 2 * flip) : 1));
-  arrowG.setAttribute("transform", `rotate(${180 * flip} 600 ${AY})`);
-  const lifo = flip >= 0.5;
-  orderLab.textContent = lifo ? "LIFO under pressure" : "FIFO";
-  orderLab.setAttribute("fill", lifo ? C.signal : C.paper);
-  arrowLine.setAttribute("stroke", lifo ? C.signal : C.paper);
-  [backLab, frontLab].forEach(e => e.setAttribute("opacity", arA));
-
-  // queue boxes
-  BOXES.forEach((b, i) => {
-    const s = boxState(b, t), e = boxEls[i];
-    if (!s || s.op <= 0.001) { e.setAttribute("opacity", 0); return; }
-    let shake = 0;
-    for (const r of REJECTS) if (t >= r && t < r + 0.35) shake = Math.sin((t - r) * 70) * 8 * (1 - p(t, r, r + 0.35));
-    let sw = 3;
-    if (b.pulse && t >= b.pulse[0] && t < b.pulse[1]) sw = 3 + 2.5 * (0.5 + 0.5 * Math.sin((t - b.pulse[0]) * 7));
-    e.setAttribute("x", slotX(s.slot) + shake); e.setAttribute("y", QY + s.lift);
-    e.setAttribute("stroke", s.col); e.setAttribute("fill", s.col); e.setAttribute("fill-opacity", s.fillOp);
-    e.setAttribute("stroke-width", sw);
-    if (s.dash) e.setAttribute("stroke-dasharray", "8 7"); else e.removeAttribute("stroke-dasharray");
-    e.setAttribute("opacity", s.op);
-  });
-
-  // retry arcs visible while retries fly
-  retryPaths.forEach((pa, i) => {
-    let a = 0;
-    for (const r of REQS) if (r.retry && r.c === i && t >= r.t0 - 0.15 && t <= r.t1 + 0.35) a = 0.9;
-    pa.setAttribute("opacity", a);
-  });
-
-  // packets
-  let n = 0;
-  for (const r of REQS) {
-    if (t < r.t0 || t > r.t1) continue;
-    const k = inOutCubic(p(t, r.t0, r.t1));
-    const path = r.retry ? retryPaths[r.c] : routes[r.c], len = r.retry ? retryLen[r.c] : routeLen[r.c];
-    const pt = path.getPointAtLength(len * k), c = dot(n++);
-    c.setAttribute("cx", pt.x); c.setAttribute("cy", pt.y); c.setAttribute("r", 8);
-    c.setAttribute("fill", r.retry ? C.alarm : C.signal);
-    c.setAttribute("opacity", Math.min(1, (t - r.t0) / 0.08, (r.t1 - t) / 0.08 + 0.3));
+  // responses travelling back to clients, up the left lane
+  let di = 0;
+  for (const r of responses) {
+    const age = t - r.t0; if (age < 0 || age > 1.6) continue;
+    const d = dotEl(di++), pa = retPaths[r.client], L = retLens[r.client];
+    const k = ease(clamp(age / .95));
+    const pt = pa.getPointAtLength(L * k);
+    d.c.setAttribute("cx", pt.x); d.c.setAttribute("cy", pt.y); d.c.setAttribute("fill", r.ok ? C.mint : C.muted); d.c.setAttribute("r", r.ok ? 13 : 10);
+    d.x.setAttribute("opacity", 0);
+    d.g.setAttribute("opacity", age < .95 ? 1 : 1 - p(age, .95, 1.15));
+    if (age >= .9) {
+      const ph = phones[r.client];
+      if (r.ok) { const rk = p(age, .9, 1.5); ph.ring.setAttribute("opacity", 1 - rk); ph.ring.setAttribute("r", 58 + 34 * rk); }
+      else ph.gone.setAttribute("opacity", 1 - p(age, 1.3, 1.6));
+    }
   }
-  for (const r of RESPS) {
-    if (t < r.t0 || t > r.t1) continue;
-    const k = 1 - inOutCubic(p(t, r.t0, r.t1));
-    const pt = routes[r.c].getPointAtLength(routeLen[r.c] * k), c = dot(n++);
-    c.setAttribute("cx", pt.x); c.setAttribute("cy", pt.y); c.setAttribute("r", 5.5);
-    c.setAttribute("fill", C.paper);
-    const dead = clientDead(r.c, r.t1);
-    c.setAttribute("opacity", Math.min(1, (t - r.t0) / 0.08) * (dead ? 1 - p(t, lerp(r.t0, r.t1, 0.55), r.t1) : 1));
-  }
-  for (let i = n; i < pool.length; i++) pool[i].setAttribute("opacity", 0);
+  for (let i = di; i < dotPool.length; i++) dotPool[i].g.setAttribute("opacity", 0);
 
-  // rejection ring + 429s
-  let rk = 0;
-  for (const r of REJECTS) if (t >= r && t < r + 0.8) rk = p(t, r, r + 0.8);
-  ring.setAttribute("rx", lerp(300, 350, outCubic(rk))); ring.setAttribute("ry", lerp(50, 90, outCubic(rk)));
-  ring.setAttribute("opacity", rk > 0 && rk < 1 ? (1 - rk) * 0.9 : 0);
-  let bI = 0;
-  for (const r of REJECTS) for (let i = 0; i < 3; i++) {
-    const age = t - r - i * 0.05; const e = badges[bI++];
-    if (age < 0 || age > 1.1) { e.setAttribute("opacity", 0); continue; }
-    e.setAttribute("x", CL[i].x + 72); e.setAttribute("y", CL[i].y - 6 - 50 * outCubic(age / 1.1));
-    e.setAttribute("opacity", Math.min(1, age / 0.12) * (1 - p(age, 0.7, 1.1)));
-  }
-  for (let i = bI; i < badges.length; i++) badges[i].setAttribute("opacity", 0);
+  // failure ring on rejections
+  let rk = -1; for (const e of SFX) if (e.kind === "reject" && t >= e.t && t < e.t + .7) rk = (t - e.t) / .7;
+  ring.setAttribute("opacity", rk >= 0 ? (1 - rk) * .9 : 0); ring.setAttribute("r", 110 + 260 * outQ(Math.max(rk, 0)));
 
-  // markers (scene 6, fade at the takeaway)
-  const off = 1 - p(t, 74.2, 74.6);
-  const f1 = p(t, 50.2, 50.6) * off, f2 = p(t, 55.6, 56.1) * off;
-  mFlip.setAttribute("opacity", f1);
-  mMeas.setAttribute("opacity", f2); lMeas.setAttribute("opacity", f2);
-  lMeas.setAttribute("transform", `translate(${(1 - outCubic(p(t, 55.6, 56.1))) * 20} 0)`);
-  lForm.setAttribute("opacity", p(t, 58.0, 58.5) * off);
-
-  // below the diagram
-  scaleLine.setAttribute("opacity", p(t, 7.66, 8.1) * (1 - p(t, 14.9, 15.28)));
-  const r1 = p(t, 67.4, 67.9), r2 = p(t, 70.75, 71.25), rOff = 1 - p(t, 73.9, 74.2);
-  row1.setAttribute("opacity", r1 * rOff); row1.setAttribute("transform", `translate(${(1 - outCubic(r1)) * 24} 0)`);
-  row2.setAttribute("opacity", r2 * rOff); row2.setAttribute("transform", `translate(${(1 - outCubic(r2)) * 24} 0)`);
-  srcLine.textContent = inScene(t, 6) ? SOURCE_S7 : SOURCE;
-  const srcSwap = (t > 61.3 && t < 61.75) ? Math.abs(p(t, 61.3, 61.75) * 2 - 1) : (t > 73.95 && t < 74.4) ? Math.abs(p(t, 73.95, 74.4) * 2 - 1) : 1;
-  srcLine.setAttribute("opacity", (t < 4.4 ? p(t, 0, 0.2) : p(t, 6.2, 6.6)) * (1 - p(t, VOICE_END - 0.2, VOICE_END + 0.2)) * srcSwap * (t >= S[1] && t < 4.8 ? 1 - p(t, S[1], 4.7) : 1));
-
-  // rewind scan into scene 2
-  const sk = p(t, S[1], 4.95), scan = document.getElementById("scan");
-  scan.setAttribute("y", lerp(1920, -10, inOutCubic(sk))); scan.setAttribute("opacity", sk > 0 && sk < 1 ? 0.9 : 0);
-
-  // series label
-  clockEl.style.opacity = p(t, 0, 0.2) * (1 - p(t, VOICE_END - 0.2, VOICE_END + 0.2));
-
-  // titles: slide up + fade in, quick fade out
-  TITLES.forEach(([a, b2], i) => {
-    const k = outQuint(p(t, a, a + 0.55)), out = 1 - p(t, b2 - 0.25, b2);
-    titleNodes[i].style.opacity = k * out;
-    titleNodes[i].style.transform = `translateY(${(1 - k) * 34}px)`;
-    titleNodes[i].style.display = (t >= a && t <= b2) ? "block" : "none";
+  // ---- overlays ----
+  $("series").textContent = "Breaks only at scale · Uber";
+  $("series").style.opacity = 1 - endK;
+  HEADS.forEach(([s], i) => {
+    const st = SC[s], en = s < 7 ? SC[s + 1] : VOICE_END + .1, he = headEls[i];
+    const vis = t >= st - .01 && t < en;
+    he.style.display = vis ? "block" : "none"; if (!vis) return;
+    const kin = outQ(p(t, st, st + .5)), kout = 1 - p(t, en - .22, en);
+    const settle = s === 7 ? 0 : ease(p(t, st + 2.4, st + 3.0));   // big for 2.4 s, then steps back
+    he.style.opacity = kin * kout * (1 - .3 * settle);
+    he.style.transform = `translateY(${(1 - kin) * 40}px) scale(${1 - .38 * settle})`;
+    if (s === 7) { he.style.top = "700px"; he.style.fontSize = "100px"; }
+    if (s === 1) he.style.opacity = kin * kout * clamp(1 - p(t, S[1] + 1.0, S[1] + 1.6) + p(t, W(1, "keeping"), W(1, "keeping") + .6));
   });
-  CAPTIONS.forEach(([a, b2], i) => {
-    const vis = t >= a && t <= b2;
-    capNodes[i].style.display = vis ? "block" : "none";
-    capNodes[i].style.opacity = p(t, a, a + 0.14) * (1 - p(t, b2 - 0.12, b2));
-  });
+  // scale overlay (scene 2)
+  const sA = p(t, W(1, "tens") - .2, W(1, "tens") + .3) * (1 - p(t, W(1, "keeping") - .3, W(1, "keeping") + .2));
+  $("scale").style.opacity = sA; $("scale").style.transform = `translateY(${(1 - outQ(sA)) * 30}px)`;
+  // big numbers (scene 7)
+  const b1 = p(t, W(6, "eighty") - .15, W(6, "eighty") + .25) * (1 - p(t, S[7] - .3, S[7]));
+  const b2 = p(t, W(6, "seventy") - .15, W(6, "seventy") + .25) * (1 - p(t, S[7] - .3, S[7]));
+  $("big1").style.opacity = b1; $("big2").style.opacity = b2;
+  $("big1").style.transform = `scale(${.92 + .08 * outB(b1)})`; $("big2").style.transform = `scale(${.92 + .08 * outB(b2)})`;
+  $("n1").textContent = "+" + Math.round(80 * outQ(p(t, W(6, "eighty") - .1, W(6, "eighty") + 1.2))) + "%";
+  $("n2").textContent = "−" + Math.round(70 * outQ(p(t, W(6, "seventy") - .1, W(6, "seventy") + 1.2))) + "%";
+  // source line
+  $("source").textContent = scene === 6 ? "source: Uber Engineering, Apr 2026 (vs. token-bucket limiter)" : "source: Uber Engineering, Apr 2026";
+  $("source").style.opacity = (scene >= 1 ? 1 : p(t, 1.0, 1.4)) * (1 - endK);
+  // captions: one phrase at a time, spoken words lit, current word amber
+  let pi = -1; for (let i = 0; i < PH.length; i++) if (t >= PH[i].start - .05 && t <= PH[i].end + .35) { pi = i; }
+  if (pi !== lastPh) { capEl.innerHTML = ""; spans = []; if (pi >= 0) PH[pi].words.forEach((w, j) => { const s = document.createElement("span"); s.textContent = w.w + (j < PH[pi].words.length - 1 ? " " : ""); capEl.appendChild(s); spans.push(s); }); lastPh = pi; }
+  if (pi >= 0) {
+    const ph = PH[pi];
+    capEl.style.opacity = p(t, ph.start - .05, ph.start + .08) * (1 - endK);
+    ph.words.forEach((w, j) => { const s = spans[j]; const cur = t >= w.t0 && t < w.t1 + .05, done = t >= w.t1;
+      s.style.color = cur ? C.signal : done ? C.paper : "rgba(232,240,247,.32)"; });
+  } else capEl.style.opacity = 0;
   // end card
-  const ek = outQuint(p(t, VOICE_END + 0.35, VOICE_END + 0.95));
-  endEl.style.opacity = ek; endEl.style.transform = `translateY(${(1 - ek) * 30}px)`;
+  const ek = outQ(p(t, VOICE_END + .35, VOICE_END + .9));
+  $("end").style.opacity = ek; $("end").style.transform = `translateY(${(1 - ek) * 30}px)`;
+  // hook flash on the first frames
+  $("flash").style.opacity = .22 * (1 - p(t, 0, .25));
 }
 window.render = render;
-window.DURATION = DURATION;
 render(0);
 </script>
 </body>

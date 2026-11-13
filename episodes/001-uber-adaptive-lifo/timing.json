@@ -1,0 +1,1330 @@
+{
+ "duration": 79.15,
+ "scenes": [
+  {
+   "start": 0.173,
+   "end": 3.709,
+   "text": "Under overload, Uber serves the newest request first."
+  },
+  {
+   "start": 4.39,
+   "end": 14.482,
+   "text": "Uber's storage platform, Docstore and Schemaless, serves tens of millions of requests per second. Their engineering team wrote about keeping it alive under overload."
+  },
+  {
+   "start": 15.278,
+   "end": 20.301,
+   "text": "Most queues are first in, first out. Fair... and at normal load, it's fine."
+  },
+  {
+   "start": 20.827,
+   "end": 34.985,
+   "text": "But under overload, the oldest requests have waited the longest. Their clients often gave up, or already retried. So the database works on answers nobody is waiting for... while fresh requests sit at the back of the line."
+  },
+  {
+   "start": 35.691,
+   "end": 44.821,
+   "text": "An earlier version had its own trap. Fixed wait times meant rejected requests all retried at once. Overload. Rejection. Repeat."
+  },
+  {
+   "start": 45.371,
+   "end": 60.978,
+   "text": "So the queue adapts. At normal load, first in, first out. Under pressure, it flips to last in, first out, favoring requests that can still succeed. And load is measured as requests in flight, right on the storage node, not as queries per second."
+  },
+  {
+   "start": 61.525,
+   "end": 73.616,
+   "text": "The rule: shed load where the state lives, and serve the requests that can still succeed. Uber reports eighty percent more throughput under overload, and about seventy percent lower P-ninety-nine latency."
+  },
+  {
+   "start": 74.203,
+   "end": 78.939,
+   "text": "Under overload, being fair to the oldest request... is unfair to everyone."
+  }
+ ],
+ "phrases": [
+  {
+   "scene": 0,
+   "start": 0.173,
+   "end": 1.136,
+   "text": "Under overload,",
+   "words": [
+    {
+     "w": "Under",
+     "t0": 0.173,
+     "t1": 0.534
+    },
+    {
+     "w": "overload,",
+     "t0": 0.534,
+     "t1": 1.136
+    }
+   ]
+  },
+  {
+   "scene": 0,
+   "start": 1.497,
+   "end": 3.709,
+   "text": "Uber serves the newest request first.",
+   "words": [
+    {
+     "w": "Uber",
+     "t0": 1.497,
+     "t1": 1.788
+    },
+    {
+     "w": "serves",
+     "t0": 1.788,
+     "t1": 2.195
+    },
+    {
+     "w": "the",
+     "t0": 2.195,
+     "t1": 2.428
+    },
+    {
+     "w": "newest",
+     "t0": 2.428,
+     "t1": 2.836
+    },
+    {
+     "w": "request",
+     "t0": 2.836,
+     "t1": 3.301
+    },
+    {
+     "w": "first.",
+     "t0": 3.301,
+     "t1": 3.709
+    }
+   ]
+  },
+  {
+   "scene": 1,
+   "start": 4.39,
+   "end": 5.848,
+   "text": "Uber's storage platform,",
+   "words": [
+    {
+     "w": "Uber's",
+     "t0": 4.39,
+     "t1": 4.798
+    },
+    {
+     "w": "storage",
+     "t0": 4.798,
+     "t1": 5.264
+    },
+    {
+     "w": "platform,",
+     "t0": 5.264,
+     "t1": 5.848
+    }
+   ]
+  },
+  {
+   "scene": 1,
+   "start": 5.989,
+   "end": 7.455,
+   "text": "Docstore and Schemaless,",
+   "words": [
+    {
+     "w": "Docstore",
+     "t0": 5.989,
+     "t1": 6.517
+    },
+    {
+     "w": "and",
+     "t0": 6.517,
+     "t1": 6.751
+    },
+    {
+     "w": "Schemaless,",
+     "t0": 6.751,
+     "t1": 7.455
+    }
+   ]
+  },
+  {
+   "scene": 1,
+   "start": 7.656,
+   "end": 10.582,
+   "text": "serves tens of millions of requests per second.",
+   "words": [
+    {
+     "w": "serves",
+     "t0": 7.656,
+     "t1": 8.082
+    },
+    {
+     "w": "tens",
+     "t0": 8.082,
+     "t1": 8.387
+    },
+    {
+     "w": "of",
+     "t0": 8.387,
+     "t1": 8.57
+    },
+    {
+     "w": "millions",
+     "t0": 8.57,
+     "t1": 9.119
+    },
+    {
+     "w": "of",
+     "t0": 9.119,
+     "t1": 9.302
+    },
+    {
+     "w": "requests",
+     "t0": 9.302,
+     "t1": 9.85
+    },
+    {
+     "w": "per",
+     "t0": 9.85,
+     "t1": 10.094
+    },
+    {
+     "w": "second.",
+     "t0": 10.094,
+     "t1": 10.582
+    }
+   ]
+  },
+  {
+   "scene": 1,
+   "start": 11.13,
+   "end": 14.482,
+   "text": "Their engineering team wrote about keeping it alive under overload.",
+   "words": [
+    {
+     "w": "Their",
+     "t0": 11.13,
+     "t1": 11.425
+    },
+    {
+     "w": "engineering",
+     "t0": 11.425,
+     "t1": 12.017
+    },
+    {
+     "w": "team",
+     "t0": 12.017,
+     "t1": 12.263
+    },
+    {
+     "w": "wrote",
+     "t0": 12.263,
+     "t1": 12.559
+    },
+    {
+     "w": "about",
+     "t0": 12.559,
+     "t1": 12.855
+    },
+    {
+     "w": "keeping",
+     "t0": 12.855,
+     "t1": 13.249
+    },
+    {
+     "w": "it",
+     "t0": 13.249,
+     "t1": 13.397
+    },
+    {
+     "w": "alive",
+     "t0": 13.397,
+     "t1": 13.693
+    },
+    {
+     "w": "under",
+     "t0": 13.693,
+     "t1": 13.989
+    },
+    {
+     "w": "overload.",
+     "t0": 13.989,
+     "t1": 14.482
+    }
+   ]
+  },
+  {
+   "scene": 2,
+   "start": 15.278,
+   "end": 17.046,
+   "text": "Most queues are first in,",
+   "words": [
+    {
+     "w": "Most",
+     "t0": 15.278,
+     "t1": 15.618
+    },
+    {
+     "w": "queues",
+     "t0": 15.618,
+     "t1": 16.094
+    },
+    {
+     "w": "are",
+     "t0": 16.094,
+     "t1": 16.366
+    },
+    {
+     "w": "first",
+     "t0": 16.366,
+     "t1": 16.774
+    },
+    {
+     "w": "in,",
+     "t0": 16.774,
+     "t1": 17.046
+    }
+   ]
+  },
+  {
+   "scene": 2,
+   "start": 17.046,
+   "end": 17.754,
+   "text": "first out.",
+   "words": [
+    {
+     "w": "first",
+     "t0": 17.046,
+     "t1": 17.432
+    },
+    {
+     "w": "out.",
+     "t0": 17.432,
+     "t1": 17.754
+    }
+   ]
+  },
+  {
+   "scene": 2,
+   "start": 17.754,
+   "end": 18.249,
+   "text": "Fair...",
+   "words": [
+    {
+     "w": "Fair...",
+     "t0": 17.754,
+     "t1": 18.249
+    }
+   ]
+  },
+  {
+   "scene": 2,
+   "start": 18.249,
+   "end": 19.593,
+   "text": "and at normal load,",
+   "words": [
+    {
+     "w": "and",
+     "t0": 18.249,
+     "t1": 18.518
+    },
+    {
+     "w": "at",
+     "t0": 18.518,
+     "t1": 18.72
+    },
+    {
+     "w": "normal",
+     "t0": 18.72,
+     "t1": 19.19
+    },
+    {
+     "w": "load,",
+     "t0": 19.19,
+     "t1": 19.593
+    }
+   ]
+  },
+  {
+   "scene": 2,
+   "start": 19.593,
+   "end": 20.301,
+   "text": "it's fine.",
+   "words": [
+    {
+     "w": "it's",
+     "t0": 19.593,
+     "t1": 19.915
+    },
+    {
+     "w": "fine.",
+     "t0": 19.915,
+     "t1": 20.301
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 20.827,
+   "end": 21.938,
+   "text": "But under overload,",
+   "words": [
+    {
+     "w": "But",
+     "t0": 20.827,
+     "t1": 21.049
+    },
+    {
+     "w": "under",
+     "t0": 21.049,
+     "t1": 21.382
+    },
+    {
+     "w": "overload,",
+     "t0": 21.382,
+     "t1": 21.938
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 22.135,
+   "end": 24.455,
+   "text": "the oldest requests have waited the longest.",
+   "words": [
+    {
+     "w": "the",
+     "t0": 22.135,
+     "t1": 22.341
+    },
+    {
+     "w": "oldest",
+     "t0": 22.341,
+     "t1": 22.702
+    },
+    {
+     "w": "requests",
+     "t0": 22.702,
+     "t1": 23.166
+    },
+    {
+     "w": "have",
+     "t0": 23.166,
+     "t1": 23.424
+    },
+    {
+     "w": "waited",
+     "t0": 23.424,
+     "t1": 23.785
+    },
+    {
+     "w": "the",
+     "t0": 23.785,
+     "t1": 23.991
+    },
+    {
+     "w": "longest.",
+     "t0": 23.991,
+     "t1": 24.455
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 24.902,
+   "end": 26.268,
+   "text": "Their clients often gave up,",
+   "words": [
+    {
+     "w": "Their",
+     "t0": 24.902,
+     "t1": 25.184
+    },
+    {
+     "w": "clients",
+     "t0": 25.184,
+     "t1": 25.561
+    },
+    {
+     "w": "often",
+     "t0": 25.561,
+     "t1": 25.844
+    },
+    {
+     "w": "gave",
+     "t0": 25.844,
+     "t1": 26.079
+    },
+    {
+     "w": "up,",
+     "t0": 26.079,
+     "t1": 26.268
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 26.438,
+   "end": 27.806,
+   "text": "or already retried.",
+   "words": [
+    {
+     "w": "or",
+     "t0": 26.438,
+     "t1": 26.643
+    },
+    {
+     "w": "already",
+     "t0": 26.643,
+     "t1": 27.19
+    },
+    {
+     "w": "retried.",
+     "t0": 27.19,
+     "t1": 27.806
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 28.305,
+   "end": 31.545,
+   "text": "So the database works on answers nobody is waiting for...",
+   "words": [
+    {
+     "w": "So",
+     "t0": 28.305,
+     "t1": 28.473
+    },
+    {
+     "w": "the",
+     "t0": 28.473,
+     "t1": 28.696
+    },
+    {
+     "w": "database",
+     "t0": 28.696,
+     "t1": 29.199
+    },
+    {
+     "w": "works",
+     "t0": 29.199,
+     "t1": 29.534
+    },
+    {
+     "w": "on",
+     "t0": 29.534,
+     "t1": 29.702
+    },
+    {
+     "w": "answers",
+     "t0": 29.702,
+     "t1": 30.149
+    },
+    {
+     "w": "nobody",
+     "t0": 30.149,
+     "t1": 30.54
+    },
+    {
+     "w": "is",
+     "t0": 30.54,
+     "t1": 30.707
+    },
+    {
+     "w": "waiting",
+     "t0": 30.707,
+     "t1": 31.154
+    },
+    {
+     "w": "for...",
+     "t0": 31.154,
+     "t1": 31.545
+    }
+   ]
+  },
+  {
+   "scene": 3,
+   "start": 31.875,
+   "end": 34.985,
+   "text": "while fresh requests sit at the back of the line.",
+   "words": [
+    {
+     "w": "while",
+     "t0": 31.875,
+     "t1": 32.248
+    },
+    {
+     "w": "fresh",
+     "t0": 32.248,
+     "t1": 32.621
+    },
+    {
+     "w": "requests",
+     "t0": 32.621,
+     "t1": 33.181
+    },
+    {
+     "w": "sit",
+     "t0": 33.181,
+     "t1": 33.43
+    },
+    {
+     "w": "at",
+     "t0": 33.43,
+     "t1": 33.617
+    },
+    {
+     "w": "the",
+     "t0": 33.617,
+     "t1": 33.865
+    },
+    {
+     "w": "back",
+     "t0": 33.865,
+     "t1": 34.177
+    },
+    {
+     "w": "of",
+     "t0": 34.177,
+     "t1": 34.363
+    },
+    {
+     "w": "the",
+     "t0": 34.363,
+     "t1": 34.612
+    },
+    {
+     "w": "line.",
+     "t0": 34.612,
+     "t1": 34.985
+    }
+   ]
+  },
+  {
+   "scene": 4,
+   "start": 35.691,
+   "end": 37.402,
+   "text": "An earlier version had its own trap.",
+   "words": [
+    {
+     "w": "An",
+     "t0": 35.691,
+     "t1": 35.829
+    },
+    {
+     "w": "earlier",
+     "t0": 35.829,
+     "t1": 36.199
+    },
+    {
+     "w": "version",
+     "t0": 36.199,
+     "t1": 36.569
+    },
+    {
+     "w": "had",
+     "t0": 36.569,
+     "t1": 36.754
+    },
+    {
+     "w": "its",
+     "t0": 36.754,
+     "t1": 36.939
+    },
+    {
+     "w": "own",
+     "t0": 36.939,
+     "t1": 37.124
+    },
+    {
+     "w": "trap.",
+     "t0": 37.124,
+     "t1": 37.402
+    }
+   ]
+  },
+  {
+   "scene": 4,
+   "start": 37.925,
+   "end": 41.813,
+   "text": "Fixed wait times meant rejected requests all retried at once.",
+   "words": [
+    {
+     "w": "Fixed",
+     "t0": 37.925,
+     "t1": 38.301
+    },
+    {
+     "w": "wait",
+     "t0": 38.301,
+     "t1": 38.614
+    },
+    {
+     "w": "times",
+     "t0": 38.614,
+     "t1": 38.991
+    },
+    {
+     "w": "meant",
+     "t0": 38.991,
+     "t1": 39.367
+    },
+    {
+     "w": "rejected",
+     "t0": 39.367,
+     "t1": 39.931
+    },
+    {
+     "w": "requests",
+     "t0": 39.931,
+     "t1": 40.496
+    },
+    {
+     "w": "all",
+     "t0": 40.496,
+     "t1": 40.747
+    },
+    {
+     "w": "retried",
+     "t0": 40.747,
+     "t1": 41.248
+    },
+    {
+     "w": "at",
+     "t0": 41.248,
+     "t1": 41.436
+    },
+    {
+     "w": "once.",
+     "t0": 41.436,
+     "t1": 41.813
+    }
+   ]
+  },
+  {
+   "scene": 4,
+   "start": 42.345,
+   "end": 42.97,
+   "text": "Overload.",
+   "words": [
+    {
+     "w": "Overload.",
+     "t0": 42.345,
+     "t1": 42.97
+    }
+   ]
+  },
+  {
+   "scene": 4,
+   "start": 43.295,
+   "end": 43.987,
+   "text": "Rejection.",
+   "words": [
+    {
+     "w": "Rejection.",
+     "t0": 43.295,
+     "t1": 43.987
+    }
+   ]
+  },
+  {
+   "scene": 4,
+   "start": 44.328,
+   "end": 44.821,
+   "text": "Repeat.",
+   "words": [
+    {
+     "w": "Repeat.",
+     "t0": 44.328,
+     "t1": 44.821
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 45.371,
+   "end": 46.7,
+   "text": "So the queue adapts.",
+   "words": [
+    {
+     "w": "So",
+     "t0": 45.371,
+     "t1": 45.561
+    },
+    {
+     "w": "the",
+     "t0": 45.561,
+     "t1": 45.814
+    },
+    {
+     "w": "queue",
+     "t0": 45.814,
+     "t1": 46.194
+    },
+    {
+     "w": "adapts.",
+     "t0": 46.194,
+     "t1": 46.7
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 46.7,
+   "end": 47.696,
+   "text": "At normal load,",
+   "words": [
+    {
+     "w": "At",
+     "t0": 46.7,
+     "t1": 46.886
+    },
+    {
+     "w": "normal",
+     "t0": 46.886,
+     "t1": 47.322
+    },
+    {
+     "w": "load,",
+     "t0": 47.322,
+     "t1": 47.696
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 47.696,
+   "end": 48.294,
+   "text": "first in,",
+   "words": [
+    {
+     "w": "first",
+     "t0": 47.696,
+     "t1": 48.054
+    },
+    {
+     "w": "in,",
+     "t0": 48.054,
+     "t1": 48.294
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 48.294,
+   "end": 48.958,
+   "text": "first out.",
+   "words": [
+    {
+     "w": "first",
+     "t0": 48.294,
+     "t1": 48.656
+    },
+    {
+     "w": "out.",
+     "t0": 48.656,
+     "t1": 48.958
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 48.958,
+   "end": 49.954,
+   "text": "Under pressure,",
+   "words": [
+    {
+     "w": "Under",
+     "t0": 48.958,
+     "t1": 49.331
+    },
+    {
+     "w": "pressure,",
+     "t0": 49.331,
+     "t1": 49.954
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 49.954,
+   "end": 51.282,
+   "text": "it flips to last in,",
+   "words": [
+    {
+     "w": "it",
+     "t0": 49.954,
+     "t1": 50.144
+    },
+    {
+     "w": "flips",
+     "t0": 50.144,
+     "t1": 50.523
+    },
+    {
+     "w": "to",
+     "t0": 50.523,
+     "t1": 50.713
+    },
+    {
+     "w": "last",
+     "t0": 50.713,
+     "t1": 51.029
+    },
+    {
+     "w": "in,",
+     "t0": 51.029,
+     "t1": 51.282
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 51.282,
+   "end": 51.946,
+   "text": "first out,",
+   "words": [
+    {
+     "w": "first",
+     "t0": 51.282,
+     "t1": 51.644
+    },
+    {
+     "w": "out,",
+     "t0": 51.644,
+     "t1": 51.946
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 51.946,
+   "end": 54.669,
+   "text": "favoring requests that can still succeed.",
+   "words": [
+    {
+     "w": "favoring",
+     "t0": 51.946,
+     "t1": 52.53
+    },
+    {
+     "w": "requests",
+     "t0": 52.53,
+     "t1": 53.113
+    },
+    {
+     "w": "that",
+     "t0": 53.113,
+     "t1": 53.437
+    },
+    {
+     "w": "can",
+     "t0": 53.437,
+     "t1": 53.696
+    },
+    {
+     "w": "still",
+     "t0": 53.696,
+     "t1": 54.085
+    },
+    {
+     "w": "succeed.",
+     "t0": 54.085,
+     "t1": 54.669
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 54.669,
+   "end": 57.524,
+   "text": "And load is measured as requests in flight,",
+   "words": [
+    {
+     "w": "And",
+     "t0": 54.669,
+     "t1": 54.928
+    },
+    {
+     "w": "load",
+     "t0": 54.928,
+     "t1": 55.253
+    },
+    {
+     "w": "is",
+     "t0": 55.253,
+     "t1": 55.448
+    },
+    {
+     "w": "measured",
+     "t0": 55.448,
+     "t1": 56.032
+    },
+    {
+     "w": "as",
+     "t0": 56.032,
+     "t1": 56.226
+    },
+    {
+     "w": "requests",
+     "t0": 56.226,
+     "t1": 56.811
+    },
+    {
+     "w": "in",
+     "t0": 56.811,
+     "t1": 57.005
+    },
+    {
+     "w": "flight,",
+     "t0": 57.005,
+     "t1": 57.524
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 57.524,
+   "end": 59.251,
+   "text": "right on the storage node,",
+   "words": [
+    {
+     "w": "right",
+     "t0": 57.524,
+     "t1": 57.908
+    },
+    {
+     "w": "on",
+     "t0": 57.908,
+     "t1": 58.1
+    },
+    {
+     "w": "the",
+     "t0": 58.1,
+     "t1": 58.356
+    },
+    {
+     "w": "storage",
+     "t0": 58.356,
+     "t1": 58.867
+    },
+    {
+     "w": "node,",
+     "t0": 58.867,
+     "t1": 59.251
+    }
+   ]
+  },
+  {
+   "scene": 5,
+   "start": 59.251,
+   "end": 60.978,
+   "text": "not as queries per second.",
+   "words": [
+    {
+     "w": "not",
+     "t0": 59.251,
+     "t1": 59.507
+    },
+    {
+     "w": "as",
+     "t0": 59.507,
+     "t1": 59.699
+    },
+    {
+     "w": "queries",
+     "t0": 59.699,
+     "t1": 60.21
+    },
+    {
+     "w": "per",
+     "t0": 60.21,
+     "t1": 60.466
+    },
+    {
+     "w": "second.",
+     "t0": 60.466,
+     "t1": 60.978
+    }
+   ]
+  },
+  {
+   "scene": 6,
+   "start": 61.525,
+   "end": 61.947,
+   "text": "The rule:",
+   "words": [
+    {
+     "w": "The",
+     "t0": 61.525,
+     "t1": 61.694
+    },
+    {
+     "w": "rule:",
+     "t0": 61.694,
+     "t1": 61.947
+    }
+   ]
+  },
+  {
+   "scene": 6,
+   "start": 62.277,
+   "end": 64.14,
+   "text": "shed load where the state lives,",
+   "words": [
+    {
+     "w": "shed",
+     "t0": 62.277,
+     "t1": 62.559
+    },
+    {
+     "w": "load",
+     "t0": 62.559,
+     "t1": 62.842
+    },
+    {
+     "w": "where",
+     "t0": 62.842,
+     "t1": 63.18
+    },
+    {
+     "w": "the",
+     "t0": 63.18,
+     "t1": 63.406
+    },
+    {
+     "w": "state",
+     "t0": 63.406,
+     "t1": 63.745
+    },
+    {
+     "w": "lives,",
+     "t0": 63.745,
+     "t1": 64.14
+    }
+   ]
+  },
+  {
+   "scene": 6,
+   "start": 64.327,
+   "end": 66.727,
+   "text": "and serve the requests that can still succeed.",
+   "words": [
+    {
+     "w": "and",
+     "t0": 64.327,
+     "t1": 64.531
+    },
+    {
+     "w": "serve",
+     "t0": 64.531,
+     "t1": 64.838
+    },
+    {
+     "w": "the",
+     "t0": 64.838,
+     "t1": 65.042
+    },
+    {
+     "w": "requests",
+     "t0": 65.042,
+     "t1": 65.502
+    },
+    {
+     "w": "that",
+     "t0": 65.502,
+     "t1": 65.757
+    },
+    {
+     "w": "can",
+     "t0": 65.757,
+     "t1": 65.961
+    },
+    {
+     "w": "still",
+     "t0": 65.961,
+     "t1": 66.268
+    },
+    {
+     "w": "succeed.",
+     "t0": 66.268,
+     "t1": 66.727
+    }
+   ]
+  },
+  {
+   "scene": 6,
+   "start": 67.379,
+   "end": 70.522,
+   "text": "Uber reports eighty percent more throughput under overload,",
+   "words": [
+    {
+     "w": "Uber",
+     "t0": 67.379,
+     "t1": 67.641
+    },
+    {
+     "w": "reports",
+     "t0": 67.641,
+     "t1": 68.06
+    },
+    {
+     "w": "eighty",
+     "t0": 68.06,
+     "t1": 68.426
+    },
+    {
+     "w": "percent",
+     "t0": 68.426,
+     "t1": 68.845
+    },
+    {
+     "w": "more",
+     "t0": 68.845,
+     "t1": 69.107
+    },
+    {
+     "w": "throughput",
+     "t0": 69.107,
+     "t1": 69.683
+    },
+    {
+     "w": "under",
+     "t0": 69.683,
+     "t1": 69.998
+    },
+    {
+     "w": "overload,",
+     "t0": 69.998,
+     "t1": 70.522
+    }
+   ]
+  },
+  {
+   "scene": 6,
+   "start": 70.741,
+   "end": 73.616,
+   "text": "and about seventy percent lower P-ninety-nine latency.",
+   "words": [
+    {
+     "w": "and",
+     "t0": 70.741,
+     "t1": 70.95
+    },
+    {
+     "w": "about",
+     "t0": 70.95,
+     "t1": 71.264
+    },
+    {
+     "w": "seventy",
+     "t0": 71.264,
+     "t1": 71.682
+    },
+    {
+     "w": "percent",
+     "t0": 71.682,
+     "t1": 72.1
+    },
+    {
+     "w": "lower",
+     "t0": 72.1,
+     "t1": 72.414
+    },
+    {
+     "w": "P-ninety-nine",
+     "t0": 72.414,
+     "t1": 73.145
+    },
+    {
+     "w": "latency.",
+     "t0": 73.145,
+     "t1": 73.616
+    }
+   ]
+  },
+  {
+   "scene": 7,
+   "start": 74.203,
+   "end": 75.097,
+   "text": "Under overload,",
+   "words": [
+    {
+     "w": "Under",
+     "t0": 74.203,
+     "t1": 74.538
+    },
+    {
+     "w": "overload,",
+     "t0": 74.538,
+     "t1": 75.097
+    }
+   ]
+  },
+  {
+   "scene": 7,
+   "start": 75.389,
+   "end": 77.243,
+   "text": "being fair to the oldest request...",
+   "words": [
+    {
+     "w": "being",
+     "t0": 75.389,
+     "t1": 75.698
+    },
+    {
+     "w": "fair",
+     "t0": 75.698,
+     "t1": 75.955
+    },
+    {
+     "w": "to",
+     "t0": 75.955,
+     "t1": 76.11
+    },
+    {
+     "w": "the",
+     "t0": 76.11,
+     "t1": 76.316
+    },
+    {
+     "w": "oldest",
+     "t0": 76.316,
+     "t1": 76.676
+    },
+    {
+     "w": "request...",
+     "t0": 76.676,
+     "t1": 77.243
+    }
+   ]
+  },
+  {
+   "scene": 7,
+   "start": 77.543,
+   "end": 78.939,
+   "text": "is unfair to everyone.",
+   "words": [
+    {
+     "w": "is",
+     "t0": 77.543,
+     "t1": 77.726
+    },
+    {
+     "w": "unfair",
+     "t0": 77.726,
+     "t1": 78.15
+    },
+    {
+     "w": "to",
+     "t0": 78.15,
+     "t1": 78.332
+    },
+    {
+     "w": "everyone.",
+     "t0": 78.332,
+     "t1": 78.939
+    }
+   ]
+  }
+ ]
+}

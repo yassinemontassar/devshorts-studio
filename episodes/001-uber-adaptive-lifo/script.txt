@@ -42,3 +42,8 @@ ElevenLabs Roger (Laid-Back, Casual, Resonant), v4, 79.15 s.
 Scene starts (s): 0, 4.39, 15.28, 20.83, 35.69, 45.37, 61.52, 74.20; voice ends 78.94.
 Note: scene_times.py's longest-gap pick misplaced 3 of 7 boundaries on this take (it split a sentence break in
 paragraph 2); starts above were checked against per-sentence speech segments.
+
+== Render (v2, approved 2026-11-13) ==
+timing:  python3 tools/word_times.py voice.mp3 episodes/001-uber-adaptive-lifo/clean.txt
+video:   python3 tools/render.py video episodes/001-uber-adaptive-lifo/index.html out/001_silent.mp4 --workers 2
+sound:   python3 tools/sound.py episodes/001-uber-adaptive-lifo/index.html voice.mp3 out/001-uber-adaptive-lifo.mp4 --video out/001_silent.mp4 --moods "0:tense,4.4:calm,20.8:tense,51:resolved"
