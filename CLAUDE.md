@@ -10,7 +10,7 @@ The channel rules, research process, scripts and house style live in the Claude 
 - `episodes/001-uber-adaptive-lifo/`: **the reference implementation ("blueprint v2" motion system, approved 2026-11-13)**. Copy its index.html; the comment at the top of its script says what to keep and what to replace. Don't invent new visual language.
 - `tools/word_times.py`: scene, phrase and word timings from the voice + clean script → `timing.json` and `timing.js` next to `clean.txt`.
 - `tools/scene_times.py`: scene starts only (used by word_times; handy for a quick check).
-- `tools/render.py`: stills for review, or the full silent MP4 (1080×1920, 30 fps, H.264).
+- `tools/render.py`: stills for review, the full silent MP4 (1080×1920, 30 fps, H.264), or `endcards`: one copy per platform with that platform's handle on the end card (only the last ~3 s are re-rendered).
 - `tools/sound.py`: sound design (synthesized SFX on `window.SFX`, a mood bed, ducked under the voice, −14 LUFS) muxed onto the silent render → the final MP4.
 
 ## Setup (once per session)
@@ -26,7 +26,8 @@ pip install playwright numpy scipy --break-system-packages   # if missing; uses 
 4. Review stills at the busiest moments, the start of every scene and the end card: `python3 tools/render.py stills episodes/NNN-slug/index.html stills 0.6 9 21 36 47 56 66 77 81` and look at them. Fix overlaps, clipping and anything under the headline before the full render.
 5. Render the silent video: `python3 tools/render.py video episodes/NNN-slug/index.html out/NNN_silent.mp4 --workers 2`
 6. Sound + final MP4: `python3 tools/sound.py episodes/NNN-slug/index.html voice.mp3 out/NNN-slug.mp4 --video out/NNN_silent.mp4 --moods "0:calm,<overload start>:tense,<fix start>:resolved"` (moods: calm, tense, resolved; times in seconds). Write the commands you used into script.txt.
-7. Commit the episode folder (index.html, script.txt, clean.txt, timing.json, timing.js; not the MP4) straight to `main` and push. New reusable components go into the episode and, once used twice, get noted here.
+7. One file per platform: `python3 tools/render.py endcards episodes/NNN-slug/index.html out/NNN-slug.mp4` → `out/NNN-slug-{tiktok,instagram,youtube,linkedin}.mp4`. The handles live in the page's `CHANNEL` table (copied from the reference). Send all four, named so he knows which goes where.
+8. Commit the episode folder (index.html, script.txt, clean.txt, timing.json, timing.js; not the MP4) straight to `main` and push. New reusable components go into the episode and, once used twice, get noted here.
 
 ## Style guardrails (the full spec is in the devshorts-episode-pack skill)
 - Blueprint ink background + drafting grid; colour means state: paper, amber = traffic/fix/hero, red = failure, mint = resolved only.
@@ -35,4 +36,4 @@ pip install playwright numpy scipy --break-system-packages   # if missing; uses 
 - One change per beat, landing on the spoken word. The camera frames the part being talked about (screen band y 340–1250); objects move, they don't just appear. Numbered amber callouts, never text cards. Source line on screen for any real company or number.
 - Open on the problem already happening (frame 1 is never empty). Big count-up numbers for results, with the world dimmed behind them.
 - Sound: a quiet synthesized SFX on every story event that matters, a mood bed (calm → tense → resolved), always under the voice.
-- End card: "Next: …" / "Part N: …", @yassine.montassar, "Full breakdown in bio", then a hard cut.
+- End card: "Next: …" / "Part N: …", the platform's own handle (TikTok @yassine.montassar4, Instagram @yassine.montassar99, YouTube @YassineMontassar, LinkedIn "Yassine Montassar"), where the source is ("Source in the pinned comment" / "in the description" / "in the first comment"), then a hard cut.
